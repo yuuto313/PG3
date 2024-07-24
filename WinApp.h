@@ -16,9 +16,10 @@ public:
 	void Initialize();
 
 	/// <summary>
-	/// 更新
+	/// メッセージの処理
 	/// </summary>
-	void Update();
+	/// <returns></returns>
+	bool ProcessMessage();
 
 	/// <summary>
 	/// 終了
