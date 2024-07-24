@@ -28,6 +28,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 #include <wrl.h>
 
+#include "Input.h"
+
 //-------------------------------------
 //構造体
 //-------------------------------------
@@ -783,11 +785,14 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 //windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
+	//ポインタ
+	Input* input = nullptr;
 	D3DResourceLeakCheker leakCheck;
 
 	//DXGIファクトリーの生成
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
+
 
 	//-------------------------------------
 	//COM（Component　Object　Model）の初期化
@@ -940,6 +945,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	}
 #endif
+
+
+	//-------------------------------------
+	//入力の初期化
+	//-------------------------------------
+
+	input = new Input();
+	input->Initialize(wc.hInstance, hwnd);
 
 	//-------------------------------------
 	//コマンドキューを生成する	
@@ -1270,125 +1283,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	assert(SUCCEEDED(hr));
 
 	//-------------------------------------
-	//球を作成ための頂点を作成する
-	//-------------------------------------
-	{
-		////-------------------------------------
-		////VertexResourceを生成する
-		////-------------------------------------
-		////球の分割数
-		//const uint32_t kSubdivision = 16;
-		//ID3D12Resource* vertexResource = CreateBufferResource(device, static_cast<size_t>(kSubdivision * kSubdivision) * 6 * sizeof(VertexData));
-
-		////-------------------------------------
-		////VertexBufferViewを作成する
-		////-------------------------------------
-
-		////頂点バッファビューを作成する
-		//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-		////リソースの先頭のアドレスから使う
-		//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-		////使用するリソースのサイズは頂点３つ分のサイズ
-		//vertexBufferView.SizeInBytes = static_cast<size_t>(kSubdivision * kSubdivision) * 6 * sizeof(VertexData);
-		////１頂点当たりのサイズ
-		//vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-		////-------------------------------------
-		////Resourceにデータを書き込む
-		////-------------------------------------
-
-		////頂点リソースにデータを書き込む
-		//VertexData* vertexData = nullptr;
-		////書き込むためのアドレスを取得
-		//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-		////-------------------------------------
-		////球を作成する
-		////-------------------------------------
-
-		////経度分割一つ分の角度
-		//const float kLonEvery = (2 * (static_cast<float>(M_PI))) / kSubdivision;
-		////緯度分割一つ分の角度
-		//const float kLatEvery = (static_cast<float>(M_PI)) / kSubdivision;
-		////緯度の方向に分割（横方向）-π/2 ~ π/2
-		//for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
-		//	float lat = -(static_cast<float>(M_PI)) / 2.0f + kLatEvery * latIndex;//現在の緯度
-		//	//経度の方向に分割（縦方向）　0~2π
-		//	for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
-		//		uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
-		//		float lon = lonIndex * kLonEvery;//現在の経度
-
-		//		float u = float(lonIndex) / float(kSubdivision);
-		//		float v = 1.0f - float(latIndex) / float(kSubdivision);
-
-		//		//頂点データを入力する。基準点a
-		//		//左下
-
-		//		vertexData[start].position.x = cosf(lat) * cos(lon);
-		//		vertexData[start].position.y = sinf(lat);
-		//		vertexData[start].position.z = cosf(lat) * sinf(lon);
-		//		vertexData[start].position.w = 1.0f;
-		//		vertexData[start].texcoord = { u,v };
-		//		vertexData[start].normal.x = vertexData[start].position.x;
-		//		vertexData[start].normal.y = vertexData[start].position.y;
-		//		vertexData[start].normal.z = vertexData[start].position.z;
-
-		//		//左上
-		//		vertexData[start + 1].position.x = cosf(lat + kLatEvery) * cosf(lon);
-		//		vertexData[start + 1].position.y = sinf(lat + kLatEvery);
-		//		vertexData[start + 1].position.z = cosf(lat + kLatEvery) * sinf(lon);
-		//		vertexData[start + 1].position.w = 1.0f;
-		//		vertexData[start + 1].texcoord = { u,v - 1.0f / kSubdivision };
-		//		vertexData[start + 1].normal.x = vertexData[start + 1].position.x;
-		//		vertexData[start + 1].normal.y = vertexData[start + 1].position.y;
-		//		vertexData[start + 1].normal.z = vertexData[start + 1].position.z;
-
-		//		//右下
-		//		vertexData[start + 2].position.x = cosf(lat) * cosf(lon + kLonEvery);
-		//		vertexData[start + 2].position.y = sinf(lat);
-		//		vertexData[start + 2].position.z = cosf(lat) * sinf(lon + kLonEvery);
-		//		vertexData[start + 2].position.w = 1.0f;
-		//		vertexData[start + 2].texcoord = { u + 1.0f / kSubdivision,v };
-		//		vertexData[start + 2].normal.x = vertexData[start + 2].position.x;
-		//		vertexData[start + 2].normal.y = vertexData[start + 2].position.y;
-		//		vertexData[start + 2].normal.z = vertexData[start + 2].position.z;
-
-		//		//２枚目の三角形
-		//		//左上
-		//		vertexData[start + 3].position.x = cosf(lat + kLatEvery) * cosf(lon);
-		//		vertexData[start + 3].position.y = sinf(lat + kLatEvery);
-		//		vertexData[start + 3].position.z = cosf(lat + kLatEvery) * sinf(lon);
-		//		vertexData[start + 3].position.w = 1.0f;
-		//		vertexData[start + 3].texcoord = { u,v - 1.0f / kSubdivision };
-		//		vertexData[start + 3].normal.x = vertexData[start + 3].position.x;
-		//		vertexData[start + 3].normal.y = vertexData[start + 3].position.y;
-		//		vertexData[start + 3].normal.z = vertexData[start + 3].position.z;
-
-		//		//右上
-		//		vertexData[start + 4].position.x = cosf(lat + kLatEvery) * cosf(lon + kLonEvery);
-		//		vertexData[start + 4].position.y = sinf(lat + kLatEvery);
-		//		vertexData[start + 4].position.z = cosf(lat + kLatEvery) * sinf(lon + kLonEvery);
-		//		vertexData[start + 4].position.w = 1.0f;
-		//		vertexData[start + 4].texcoord = { u + 1.0f / kSubdivision,v - 1.0f / kSubdivision };
-		//		vertexData[start + 4].normal.x = vertexData[start + 4].position.x;
-		//		vertexData[start + 4].normal.y = vertexData[start + 4].position.y;
-		//		vertexData[start + 4].normal.z = vertexData[start + 4].position.z;
-
-		//		//右下
-		//		vertexData[start + 5].position.x = cosf(lat) * cosf(lon + kLonEvery);
-		//		vertexData[start + 5].position.y = sinf(lat);
-		//		vertexData[start + 5].position.z = cosf(lat) * sinf(lon + kLonEvery);
-		//		vertexData[start + 5].position.w = 1.0f;
-		//		vertexData[start + 5].texcoord = { u + 1.0f / kSubdivision,v };
-		//		vertexData[start + 5].normal.x = vertexData[start + 5].position.x;
-		//		vertexData[start + 5].normal.y = vertexData[start + 5].position.y;
-		//		vertexData[start + 5].normal.z = vertexData[start + 5].position.z;
-
-		//	}
-		//}
-	}
-
-	//-------------------------------------
 	//ModelDataを使ったResourceの作成
 	//-------------------------------------
 
@@ -1706,6 +1600,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		else {
 			//-------------------------------------
+			//入力処理の更新
+			//-------------------------------------
+
+			input->Update();
+
+			//-------------------------------------
 			//CBufferの中身を更新する
 			//-------------------------------------
 			//transform.rotate.y += 0.03f;
@@ -1962,20 +1862,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif 
 
 	CloseWindow(hwnd);
-
-	//-------------------------------------
-	//ReportLiveObjects（解放を忘れたときに警告を表示するようにする）
-	//-------------------------------------
-
-	//リリースリークチェック
-	/*Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		debug->Release();
-	}*/
 
 
 	return 0;
