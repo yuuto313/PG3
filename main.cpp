@@ -29,6 +29,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include <wrl.h>
 
 #include "Input.h"
+#include "WinApp.h"
 
 //-------------------------------------
 //構造体
@@ -787,6 +788,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//ポインタ
 	Input* input = nullptr;
+	WinApp* winApp = nullptr;
+	//WinAppAPIの初期化
+	winApp = new WinApp();
+	winApp->Initialize();
+
 	D3DResourceLeakCheker leakCheck;
 
 	//DXGIファクトリーの生成
@@ -1856,6 +1862,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
+	delete input;
+	delete winApp;
 
 #ifdef _DEBUG
 	//debugController->Release();
