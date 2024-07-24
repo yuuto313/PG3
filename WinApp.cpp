@@ -38,16 +38,16 @@ void WinApp::Initialize()
 	//ウィンドウプロシージャ
 	//-------------------------------------
 	
-	wc.lpfnWndProc = WindowProc;
+	wc_.lpfnWndProc = WindowProc;
 	//ウィンドウクラス名
-	wc.lpszClassName = L"GE3";
+	wc_.lpszClassName = L"GE3";
 	//インスタンスハンドル
-	wc.hInstance = GetModuleHandle(nullptr);
+	wc_.hInstance = GetModuleHandle(nullptr);
 	//カーソル
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wc_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
 	//ウィンドウクラスを登録する
-	RegisterClass(&wc);
+	RegisterClass(&wc_);
 
 
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
@@ -60,8 +60,8 @@ void WinApp::Initialize()
 	// ウィンドウの生成
 	//-------------------------------------
 
-	hwnd = CreateWindow(
-		wc.lpszClassName,               //引用するクラス名
+	hwnd_ = CreateWindow(
+		wc_.lpszClassName,               //引用するクラス名
 		L"GE3",                         //タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,            //よく見るウィンドウスタイル
 		CW_USEDEFAULT,                  //表示X座標（Windowsに任せる）
@@ -70,15 +70,21 @@ void WinApp::Initialize()
 		wrc.bottom - wrc.top,           //ウィンドウ縦幅
 		nullptr,                        //親ウィンドウハンドル
 		nullptr,                        //メニューハンドル
-		wc.hInstance,                   //インスタンスハンドル
+		wc_.hInstance,                   //インスタンスハンドル
 		nullptr                         //オプション
 	);
 
-	ShowWindow(hwnd, SW_SHOW);
+	ShowWindow(hwnd_, SW_SHOW);
 
 }
 
 void WinApp::Update()
 {
 
+}
+
+void WinApp::Finalize()
+{
+	CloseWindow(hwnd_);
+	CoUninitialize();
 }

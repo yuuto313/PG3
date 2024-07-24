@@ -904,7 +904,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	input = new Input();
-	input->Initialize(winApp->GetHInstance(), winApp->GetHwnd());
+	input->Initialize(winApp);
 
 	//-------------------------------------
 	//コマンドキューを生成する	
@@ -1798,6 +1798,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGui::DestroyContext();
 
 	//-------------------------------------
+	//WindowsAPIの終了処理
+	//-------------------------------------
+	
+	winApp->Finalize();
+
+	//-------------------------------------
     //解放処理
     //-------------------------------------
 
@@ -1814,9 +1820,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #ifdef _DEBUG
 	//debugController->Release();
 #endif 
-
-	CloseWindow(winApp->GetHwnd());
-
 
 	return 0;
 }

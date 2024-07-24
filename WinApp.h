@@ -21,12 +21,17 @@ public:
 	void Update();
 
 	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
+
+	/// <summary>
 	/// hwndゲッター
 	/// </summary>
 	/// <returns></returns>
-	HWND GetHwnd()const { return hwnd; }
+	HWND GetHwnd()const { return hwnd_; }
 
-	HINSTANCE GetHInstance()const { return wc.hInstance; }
+	HINSTANCE GetHInstance()const { return wc_.hInstance; }
 
 	//クライアント領域サイズ
 	static const int32_t kClientWidth = 1280;
@@ -34,9 +39,9 @@ public:
 
 private:
 	//ウィンドウハンドル
-	HWND hwnd = nullptr;
+	HWND hwnd_ = nullptr;
 
 	//ウィンドウクラスの設定
-	WNDCLASS wc{};
+	WNDCLASS wc_{};
 };
 

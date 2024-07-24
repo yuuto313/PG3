@@ -5,6 +5,7 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
+#include "WinApp.h"
 
 /// <summary>
 /// 入力
@@ -18,7 +19,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(HINSTANCE hInstance,HWND hwnd);
+	void Initialize(WinApp* winApp);
 
 	/// <summary>
 	/// 更新
@@ -40,15 +41,18 @@ public:
 	bool TriggerKey(BYTE keyNumber);
 private:
 	//DirectInputのインスタンス生成
-	ComPtr<IDirectInput8> directInput;
+	ComPtr<IDirectInput8> directInput_;
 
 	//キーボードデバイス生成
-	ComPtr<IDirectInputDevice8> keyboard;
+	ComPtr<IDirectInputDevice8> keyboard_;
 
 	//全キーの状態
-	BYTE key[256] = {};
+	BYTE key_[256] = {};
 
 	//前回の全キーの状態
-	BYTE keyPre[256] = {};
+	BYTE keyPre_[256] = {};
+
+	//WindowsAPI
+	WinApp* winApp_ = nullptr;
 };
 
