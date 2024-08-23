@@ -30,6 +30,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 #include "Input.h"
 #include "WinApp.h"
+#include "DirectXCommon.h"
 
 //-------------------------------------
 //構造体
@@ -789,9 +790,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ポインタ
 	Input* input = nullptr;
 	WinApp* winApp = nullptr;
+	DirectXCommon* dxCommon = nullptr;
+
 	//WinAppAPIの初期化
 	winApp = new WinApp();
 	winApp->Initialize();
+
+	//DirectXの初期化
+	dxCommon = new DirectXCommon();
+	dxCommon->Initialize(winApp);
 
 	D3DResourceLeakCheker leakCheck;
 
@@ -1811,6 +1818,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	vertexShaderBlob->Release();
 	delete input;
 	delete winApp;
+	delete dxCommon;
 
 #ifdef _DEBUG
 	//debugController->Release();
