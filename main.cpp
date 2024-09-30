@@ -2,10 +2,10 @@
 #include <Windows.h>
 
 int main() {
-	// UTF-8を設定
-	SetConsoleOutputCP(65001);
 
-	printf("小澤ダヨ");
+	printf("こんにちは\n");
+	printf("小澤ダヨ\n");
+	printf("goodbye\n");
 
 	return 0;
 }
