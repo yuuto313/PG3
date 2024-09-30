@@ -14,7 +14,7 @@ Type Min(Type a, Type b) {
 
 template<>
 
-char Min(char a, char b) {
+char Min<char>(char a, char b) {
 	printf("数字以外は代入できません！\n");
 	return 0;
 }
