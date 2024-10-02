@@ -1,4 +1,5 @@
 #pragma once
+#include <windows.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxcapi.h>
@@ -15,7 +16,7 @@
 //どこを実装するとエラーになるか確認
 
 /// <summary>
-/// DIrectX基盤
+/// DirectX基盤
 /// </summary>
 class DirectXCommon
 {
@@ -23,10 +24,20 @@ public:
 	//namespace省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+	//-------------基本処理-------------//
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize(WinApp* winApp);
+
+	//-------------ゲッター・セッター-------------//
+
+	/// <summary>
+	/// デバイスの取得
+	/// </summary>
+	/// <returns>デバイス</returns>
+	ID3D12Device* GetDevice() const { return device_.Get(); }
 
 	/// <summary>
 	/// SRVの指定番号のCPUデスクリプタハンドルを取得する
@@ -42,41 +53,47 @@ public:
 	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandel(uint32_t index);
 
-private:
+private: 
+	//-------------メンバ変数-------------//
+	
 	//WindowsAPI
-	WinApp* winApp = nullptr;
+	WinApp* winApp_ = nullptr;
 
-	//DirectX12デバイス
-	ComPtr<ID3D12Device> device;
-	ComPtr<IDXGIFactory7> dxgiFactory;
-	ComPtr<ID3D12CommandAllocator> commandAllocator;
-	ComPtr<ID3D12GraphicsCommandList> commandList;
-	ComPtr<ID3D12CommandQueue> commandQueue;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
-	ComPtr<IDXGISwapChain4> swapChain;
-	ComPtr<ID3D12Resource> depthStencilResource;
-	ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
-	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
-	ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap;
-	std::array<ComPtr<ID3D12Resource>, 2> swapChainResources;
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc;
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	ComPtr<ID3D12Fence> fence;
-	D3D12_VIEWPORT viewport{};
-	D3D12_RECT scissorRect{};
-	IDxcUtils* dxcUtils;
-	IDxcCompiler3* dxcCompiler;
-	IDxcIncludeHandler* includeHandler;
+	//Direct3D関連
+	Microsoft::WRL::ComPtr<ID3D12Device> device_;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;
+	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
 
-	uint32_t descriptorSizeSRV;
-	uint32_t descriptorSizeRTV;
-	uint32_t descriptorSizeDSV;
+	D3D12_VIEWPORT viewport_{};
+	D3D12_RECT scissorRect_{};
+
+	IDxcUtils* dxcUtils_;
+	IDxcCompiler3* dxcCompiler_;
+	IDxcIncludeHandler* includeHandler_;
+
+	uint32_t descriptorSizeSRV_;
+	uint32_t descriptorSizeRTV_;
+	uint32_t descriptorSizeDSV_;
+
+	//-------------メンバ関数-------------//
 
 	/// <summary>
 	/// デバイスの生成
 	/// </summary>
 	/// <param name="result"></param>
-	void InitializeDevice();
+	void InitializeDXGIDevice();
 
 	/// <summary>
 	/// コマンド関連の生成
@@ -88,12 +105,12 @@ private:
 	/// スワップチェーンの生成
 	/// </summary>
 	/// <param name="result"></param>
-	void InitializeSwapChain();
+	void CreateSwapChain();
 
 	/// <summary>
 	/// 深度バッファの生成
 	/// </summary>
-	void InitialzeDepthBuffer();
+	void CreateDepthBuffer();
 
 	/// <summary>
 	/// 深度バッファリソースを作成する
@@ -151,7 +168,7 @@ private:
 	/// フェンスの生成
 	/// </summary>
 	/// <param name="result"></param>
-	void InitializeFence();
+	void CreateFence();
 
 	/// <summary>
 	/// ビューポート矩形の初期化

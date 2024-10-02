@@ -1,5 +1,6 @@
-#include "StringUtilty.h"
+#include "StringUtility.h"
 #include <stringapiset.h>
+#include <winnt.h>
 
 //namespace StringUtilty {
 //    std::wstring ConvertString(const std::string& str)
