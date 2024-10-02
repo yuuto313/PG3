@@ -31,6 +31,16 @@ public:
 	/// </summary>
 	void Initialize(WinApp* winApp);
 
+	/// <summary>
+	/// 描画前処理
+	/// </summary>
+	void PreDraw();
+
+	/// <summary>
+	/// 描画後処理
+	/// </summary>
+	void PostDraw();
+
 	//-------------ゲッター・セッター-------------//
 
 	/// <summary>
@@ -66,7 +76,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_;
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
@@ -75,6 +85,9 @@ private:
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_;
+	// フェンス値
+	UINT64 fenceVal_ = 0;
+	HANDLE fenceEvent_;
 
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};

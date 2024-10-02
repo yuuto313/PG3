@@ -1246,11 +1246,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームループを抜ける
 			break;
 		}
+
 		//-------------------------------------
 		//入力処理の更新
 		//-------------------------------------
 
 		input->Update();
+		
 
 		////-------------------------------------
 		////CBufferの中身を更新する
@@ -1313,39 +1315,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		////-------------------------------------
 		//directionalLightData->direction = Normalize(directionalLightData->direction);
 
-		////ゲームの処理
+		
+		//-------------------------------------
+		// 描画前処理
+		//-------------------------------------
 
-		////-------------------------------------
-		////コマンドを積み込んで確定させる
-		////-------------------------------------
-
-		////これから書き込むバックバッファのインデックスを取得
-		//UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-		////-------------------------------------
-		////TransitionBarrierを張る
-		////-------------------------------------
-		//D3D12_RESOURCE_BARRIER barrier{};
-
-		////今回のバリアはTransition
-		//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		////Noneにしておく
-		//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		////バリアを張る対象のリソース。現在のバックバッファに対して行う
-		//barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
-		////遷移前（現在）の	ResourceState
-		//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-		////遷移後のResourceState
-		//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		////TransitionBarrierを張る
-		//commandList->ResourceBarrier(1, &barrier);
-
-
-		////描画先のRTVを設定する
-		//commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, nullptr);
-		////指定した色で画面全体をクリアする
-		//float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };//青っぽい色。RGBAの順
-		//commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+		dxCommon->PreDraw();		
 
 		////-------------------------------------
 		////ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
@@ -1354,27 +1329,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ImGui::Render();
 
 		////-------------------------------------
-		////ImGuiを描画する
-		////-------------------------------------
-
-		////描画用ディスクリプタヒープの設定
-		//Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap.Get() };
-		//commandList->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
-		////-------------------------------------
 		////コマンドを積んで描画
-		////-------------------------------------
-
-		////-------------------------------------
-		////DSVを設定する
-		////-------------------------------------
-
-		//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		//commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
-		//commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-		//commandList->RSSetViewports(1, &viewport);//Viewportを設定
-		//commandList->RSSetScissorRects(1, &scissorRect);//Scirssorを設定
+		////-------------------------------------		
+		
 		////RootSignatureを設定。PSOに設定してるけど別途設定が必要
 		//commandList->SetGraphicsRootSignature(rootSignature.Get());
 		//commandList->SetPipelineState(graphicsPipelineState.Get());//PSOを設定
@@ -1426,56 +1383,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		////実際のcommandListのImGuiの描画コマンドを積む
 		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+		
+		//-------------------------------------
+		// 描画後処理
+		//-------------------------------------
 
-		////画面に描く処理はすべて終わり、画面に映すので状態を遷移
-		////今回はRenderTargetからPresentにする
-		//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		////TransitionBarrierを張る
-		//commandList->ResourceBarrier(1, &barrier);
-
-		////コマンドリストの内容を確定させる。すべてのコマンドを積んでからClearすること
-		//hr = commandList->Close();
-		//assert(SUCCEEDED(hr));
-
-		////-------------------------------------
-		////コマンドをキックする
-		////-------------------------------------
-
-		////GPUのコマンドリストの実行を行わせる
-		//Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList };
-		//commandQueue->ExecuteCommandLists(1, commandLists->GetAddressOf());
-		////GPUとOSに画面の交換を行うよう通知する
-		//swapChain->Present(1, 0);
-
-		////-------------------------------------
-		////GPUにSignalを送る
-		////-------------------------------------
-
-		////Fenceの値を更新
-		//fenceValue++;
-
-		////GPUがここまでたどり着いたときに、Fenceの値を指定した値に記入するようにSignalを送る
-		//commandQueue->Signal(fence.Get(), fenceValue);
-
-		////-------------------------------------
-		////Fenceの値を確認してGPUを待つ
-		////-------------------------------------
-
-		//if (fence->GetCompletedValue() < fenceValue) {
-		//	//指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
-		//	fence->SetEventOnCompletion(fenceValue, fenceEvent);
-		//	//イベントを待つ
-		//	WaitForSingleObject(fenceEvent, INFINITE);
-		//}
-
-		////次のフレーム用のコマンドリストを準備
-		//hr = commandAllocator->Reset();
-		//assert(SUCCEEDED(hr));
-		//hr = commandList->Reset(commandAllocator.Get(), nullptr);
-		//assert(SUCCEEDED(hr));
-
-
+		dxCommon->PostDraw();
+		
 	}
 
 	//-------------------------------------
