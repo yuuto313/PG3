@@ -5,9 +5,11 @@
 #include <dxcapi.h>
 #include <wrl.h>
 #include <array>
+#include <string>
 
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
+#include "externals/DirectXTex/DirectXTex.h"
 
 #include "WinApp.h"
 
@@ -101,6 +103,44 @@ private:
 	uint32_t descriptorSizeDSV_;
 
 	//-------------メンバ関数-------------//
+
+	/// <summary>
+	/// シェーダーのコンパイル
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <param name="profile"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
+	/// <summary>
+	/// バッファリソースの生成
+	/// </summary>
+	/// <param name="sizeInBytes"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+	/// <summary>
+	/// テクスチャリソースの生成
+	/// </summary>
+	/// <param name="metaData"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	/// テクスチャデータの転送
+	/// </summary>
+	/// <param name="texture"></param>
+	/// <param name="mipImages"></param>
+	/// <returns></returns>
+	[[nodiscard]]
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+
+	/// <summary>
+	/// テクスチャファイルの読み込み
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <returns></returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 	/// <summary>
 	/// デバイスの生成
