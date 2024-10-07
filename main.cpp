@@ -9,13 +9,13 @@ int RegularWage(int hours) {
 	return hourlyWage * hours;
 }
 
-// 再帰関数で時給を計算する
+// 再帰的な賃金体系
 int RecursiveWage(int hour) {
 	if (hour == 1) {
-		// 最初の1時間目の時給は100円
+		// 最初の1時間目の時給
 		return 100;
 	} else {
-		// それ以降の時給は「前の時給 * 2 - 50円」
+		// それ以降の時給
 		return RecursiveWage(hour - 1) * 2 - 50;
 	}
 }
