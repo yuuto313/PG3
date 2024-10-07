@@ -34,8 +34,14 @@ private:
 
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_;
 
-
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
+	D3D12_BLEND_DESC blendDesc_{};
+	D3D12_RASTERIZER_DESC rasterizerDesc_{};
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
 
 	//-------------メンバ関数-------------//
 
