@@ -7,11 +7,12 @@ typedef void(*PFunc)(std::string);
 
 // サイコロの出目を計算
 int CalculateTheRoll() {
-	unsigned int currentTime = time(nullptr);
-	srand(currentTime);
+	time_t currentTime = time(nullptr);
+	srand(static_cast<unsigned int>(currentTime));
+
 	// 1~6の出目のサイコロ
 	int dice = rand() % 6 + 1;
-	
+
 	return dice;
 }
 
@@ -28,6 +29,11 @@ std::string Reception() {
 	std::string userInput;
 	std::cout << "奇数か偶数かを入力してください(奇数/偶数) : ";
 	std::cin >> userInput;
+
+	if (userInput != "偶数" && userInput != "奇数") {
+		std::cout << "受け付けられない文字です" << std::endl;
+		exit(1);
+	}
 
 	return userInput;
 }
@@ -46,7 +52,7 @@ void Judgement(std::string userInput) {
 	PrintResult(dice);
 }
 
-void SetTimeout(PFunc p, int second,std::string userInput) {
+void SetTimeout(PFunc p, int second, std::string userInput) {
 	// コールバック関数を呼び出す
 	Sleep(second * 1000);
 
@@ -64,7 +70,7 @@ int main(void) {
 
 	pfunc = Judgement;
 	// 3秒待つようにセット
-	SetTimeout(pfunc, coolTime,userInput);
+	SetTimeout(pfunc, coolTime, userInput);
 
 	return 0;
 }
