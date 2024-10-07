@@ -6,6 +6,7 @@
 #include <wrl.h>
 #include <array>
 #include <string>
+#include <chrono>
 
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -154,6 +155,11 @@ private:
 	uint32_t descriptorSizeRTV_;
 	uint32_t descriptorSizeDSV_;
 
+	/// <summary>
+	/// 記録時間(FPS固定用)
+	/// </summary>
+	std::chrono::steady_clock::time_point reference_;
+
 	//-------------メンバ関数-------------//
 
 	/// <summary>
@@ -257,5 +263,15 @@ private:
 	/// ImGuiの初期化
 	/// </summary>
 	void InitializeImGui();
+
+	/// <summary>
+	/// FPS固定初期化
+	/// </summary>
+	void InitializeFixFPS();
+
+	/// <summary>
+	/// FPS固定更新
+	/// </summary>
+	void UpdateFixFPS();
 };
 
