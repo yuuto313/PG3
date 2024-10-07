@@ -31,6 +31,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "Input.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
+#include "SpriteCommon.h"
+#include "Sprite.h"
 #include "Logger.h"
 #include "StringUtility.h"
 #include "D3DResourceLeakChecker.h"
@@ -270,7 +272,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Input* input = nullptr;
 	WinApp* winApp = nullptr;
 	DirectXCommon* dxCommon = nullptr;
-	
+	SpriteCommon* spriteCommon = nullptr;	
+	Sprite* sprite = nullptr;
+
+#pragma region 基盤システムの初期化
 
 	//-------------------------------------
 	// リークチェッカー
@@ -299,6 +304,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
 
+	//-------------------------------------
+	// スプライト共通部の初期化
+	//-------------------------------------
+
+	spriteCommon = new SpriteCommon();
+	spriteCommon->Initialize();
+
+	//-------------------------------------
+	// スプライトの初期化
+	//-------------------------------------
+
+	sprite = new Sprite();
+	sprite->Initialize();
+
+#pragma endregion 基盤システムの初期化
 
 #ifdef _DEBUG
 
@@ -986,9 +1006,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();*/
+	delete sprite;
+	delete spriteCommon;
+	delete dxCommon;
 	delete input;
 	delete winApp;
-	delete dxCommon;
 
 #ifdef _DEBUG
 	//debugController->Release();
