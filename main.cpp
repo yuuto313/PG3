@@ -1,41 +1,70 @@
 #include <stdio.h>
 #include <iostream>
 #include <Windows.h>
+#include<time.h>
 
-// 一般的な賃金体系
-int RegularWage(int hours) {
-	// 時給
-	const int hourlyWage = 1072;
-	return hourlyWage * hours;
+typedef void(*PFunc)(std::string);
+
+// サイコロの出目を計算
+int CalculateTheRoll() {
+	unsigned int currentTime = time(nullptr);
+	srand(currentTime);
+	// 1~6の出目のサイコロ
+	int dice = rand() % 6 + 1;
+	
+	return dice;
 }
 
-// 再帰関数で時給を計算する
-int RecursiveWage(int hour) {
-	if (hour == 1) {
-		// 最初の1時間目の時給は100円
-		return 100;
+// サイコロの結果を表示
+void PrintResult(int dice) {
+	std::cout << "サイコロの出目 = " << dice << std::endl;
+}
+
+// ユーザーから回答を受付
+std::string Reception() {
+	std::cout << "これからサイコロを振ります" << std::endl;
+
+	// ユーザーから奇数か偶数かの入力を受付、表示
+	std::string userInput;
+	std::cout << "奇数か偶数かを入力してください(奇数/偶数) : ";
+	std::cin >> userInput;
+
+	return userInput;
+}
+
+// ユーザーからの回答をジャッジ
+void Judgement(std::string userInput) {
+
+	int dice = CalculateTheRoll();
+
+	if (dice % 2 == 0 && userInput == "偶数" || dice % 2 != 0 && userInput == "奇数") {
+		std::cout << "正解" << std::endl;
 	} else {
-		// それ以降の時給は「前の時給 * 2 - 50円」
-		return RecursiveWage(hour - 1) * 2 - 50;
+		std::cout << "不正解" << std::endl;
 	}
+
+	PrintResult(dice);
 }
 
-int main() {
+void SetTimeout(PFunc p, int second,std::string userInput) {
+	// コールバック関数を呼び出す
+	Sleep(second * 1000);
 
-	// 働く時間
-	int workingHours = 10;
-	// 結果
-	int result = {};
+	p(userInput);
+}
 
-	for (int hour = 1; hour < workingHours; hour++) {
-		result = RegularWage(hour);
-		printf("一般的な賃金体系\n");
-		printf("%d\n", result);
+int main(void) {
 
-		result = RecursiveWage(hour);
-		printf("再帰的な賃金体系\n");
-		printf("%d\n", result);
-	}
+	int coolTime = 3;
+
+	std::string userInput = Reception();
+
+	// 関数ポインタを宣言
+	void (*pfunc)(std::string);
+
+	pfunc = Judgement;
+	// 3秒待つようにセット
+	SetTimeout(pfunc, coolTime,userInput);
 
 	return 0;
 }
