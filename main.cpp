@@ -2,50 +2,40 @@
 #include <iostream>
 #include <Windows.h>
 
-template<typename Type>
+// 一般的な賃金体系
+int RegularWage(int hours) {
+	// 時給
+	const int hourlyWage = 1072;
+	return hourlyWage * hours;
+}
 
-Type Min(Type a, Type b) {
-	if (a < b) {
-		return a;
+// 再帰関数で時給を計算する
+int RecursiveWage(int hour) {
+	if (hour == 1) {
+		// 最初の1時間目の時給は100円
+		return 100;
 	} else {
-		return b;
+		// それ以降の時給は「前の時給 * 2 - 50円」
+		return RecursiveWage(hour - 1) * 2 - 50;
 	}
 }
 
-template<>
-
-char Min<char>(char a, char b) {
-	printf("数字以外は代入できません！\n");
-	return 0;
-}
-
 int main() {
-	// int型
-	int x = 3;
-	int y = 5;
 
-	// float型
-	float a = 90.0f;
-	float b = 25.0f;
+	// 働く時間
+	int workingHours = 10;
+	// 結果
+	int result = {};
 
-	// double型
-	double p = 3.141592;
-	double q = 4.252603;
+	for (int hour = 1; hour < workingHours; hour++) {
+		result = RegularWage(hour);
+		printf("一般的な賃金体系\n");
+		printf("%d\n", result);
 
-	char str1 = 'K';
-	char str2 = 'G';
-
-	printf("intの比較 : %d,%d\n",x,y);
-	printf("%d\n", Min(x,y));
-
-	printf("floatの比較 : %f,%f\n",a,b);
-	printf("%f\n", Min(a,b));
-
-	printf("doubleの比較 : %f,%f\n",p,q);
-	printf("%f\n", Min(p,q));
-
-	printf("charの比較 : %c,%c\n",str1,str2);
-	Min(str1, str2);
+		result = RecursiveWage(hour);
+		printf("再帰的な賃金体系\n");
+		printf("%d\n", result);
+	}
 
 	return 0;
 }
