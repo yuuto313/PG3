@@ -29,6 +29,11 @@ std::string Reception() {
 	std::cout << "奇数か偶数かを入力してください(奇数/偶数) : ";
 	std::cin >> userInput;
 
+	if (userInput != "偶数" && userInput != "奇数") {
+		std::cout << "受け付けられない文字です" << std::endl;
+		exit(1);
+	}
+
 	return userInput;
 }
 
