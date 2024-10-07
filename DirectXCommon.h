@@ -29,6 +29,44 @@ public:
 	//-------------基本処理-------------//
 
 	/// <summary>
+	/// シェーダーのコンパイル
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <param name="profile"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
+	/// <summary>
+	/// バッファリソースの生成
+	/// </summary>
+	/// <param name="sizeInBytes"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
+
+	/// <summary>
+	/// テクスチャリソースの生成
+	/// </summary>
+	/// <param name="metaData"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	/// テクスチャデータの転送
+	/// </summary>
+	/// <param name="texture"></param>
+	/// <param name="mipImages"></param>
+	/// <returns></returns>
+	[[nodiscard]]
+	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+
+	/// <summary>
+	/// テクスチャファイルの読み込み
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <returns></returns>
+	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
+
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize(WinApp* winApp);
@@ -50,6 +88,20 @@ public:
 	/// </summary>
 	/// <returns>デバイス</returns>
 	ID3D12Device* GetDevice() const { return device_.Get(); }
+
+	/// <summary>
+	/// SRVを取得
+	/// </summary>
+	/// <returns></returns>
+	ID3D12DescriptorHeap* GetSrvDescriptorHeap()const { return srvDescriptorHeap_.Get(); }
+
+	uint32_t GetDescriptorSizeSRV()const { return descriptorSizeSRV_; }
+
+	/// <summary>
+	/// コマンドリストの取得
+	/// </summary>
+	/// <returns></returns>
+	ID3D12GraphicsCommandList* GetCommandList()const { return commandList_.Get(); }
 
 	/// <summary>
 	/// SRVの指定番号のCPUデスクリプタハンドルを取得する
@@ -103,44 +155,6 @@ private:
 	uint32_t descriptorSizeDSV_;
 
 	//-------------メンバ関数-------------//
-
-	/// <summary>
-	/// シェーダーのコンパイル
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="profile"></param>
-	/// <returns></returns>
-	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
-
-	/// <summary>
-	/// バッファリソースの生成
-	/// </summary>
-	/// <param name="sizeInBytes"></param>
-	/// <returns></returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
-
-	/// <summary>
-	/// テクスチャリソースの生成
-	/// </summary>
-	/// <param name="metaData"></param>
-	/// <returns></returns>
-	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
-
-	/// <summary>
-	/// テクスチャデータの転送
-	/// </summary>
-	/// <param name="texture"></param>
-	/// <param name="mipImages"></param>
-	/// <returns></returns>
-	[[nodiscard]]
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
-
-	/// <summary>
-	/// テクスチャファイルの読み込み
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <returns></returns>
-	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 	/// <summary>
 	/// デバイスの生成

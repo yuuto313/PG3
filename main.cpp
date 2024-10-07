@@ -33,6 +33,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "DirectXCommon.h"
 #include "Logger.h"
 #include "StringUtility.h"
+#include "D3DResourceLeakChecker.h"
 #include "MyMath.h"
 
 typedef struct {
@@ -79,26 +80,6 @@ typedef struct {
 	std::vector<VertexData> vertices;
 	MaterialData material;
 }ModelData;
-
-struct D3DResourceLeakCheker {
-	~D3DResourceLeakCheker() 
-	{
-		//-------------------------------------
-		//ReportLiveObjects（解放を忘れたときに警告を表示するようにする）
-		//-------------------------------------
-
-		//リリースリークチェック
-		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
-
-		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug)))) {
-			debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-			debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-			debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-			//debug->Release();
-		}
-	}
-};
-
 
 //-------------------------------------
 //DepthStencilTextureを作る
@@ -285,9 +266,17 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//ポインタ
+	D3DResourceLeakChecker* leakChecke = nullptr;
 	Input* input = nullptr;
 	WinApp* winApp = nullptr;
 	DirectXCommon* dxCommon = nullptr;
+	
+
+	//-------------------------------------
+	// リークチェッカー
+	//-------------------------------------
+
+	leakChecke->~D3DResourceLeakChecker();
 
 	//-------------------------------------
 	// WinAppAPIの初期化
@@ -309,9 +298,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
-
-	D3DResourceLeakCheker leakCheck;
-
 
 
 #ifdef _DEBUG
@@ -347,474 +333,474 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 #endif
 
-	////-------------------------------------
-	////ここからPSOの作成
-	////-------------------------------------
-
-	////-------------------------------------
-	////DescriptorRangeを作成
-	////-------------------------------------
-	//D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
-	//descriptorRange[0].BaseShaderRegister = 0;//0から始まる
-	//descriptorRange[0].NumDescriptors = 1;//数は1つ
-	//descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
-	//descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
-
-	////-------------------------------------
-	////RootSignatureを作成
-	////-------------------------------------
-	////ShaderとResourceをどのように関連付けるかを示したオブジェクト
-
-	////RootSignature作成
-	//D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	//descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-
-	////RootParameter作成。複数設定できるので配列。今回はPixelShaderのMaterialとVertexShaderのTransform
-	//D3D12_ROOT_PARAMETER rootParameters[4] = {};
-	//rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; //CBVを使う
-	//rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //PixelShaderで使う
-	//rootParameters[0].Descriptor.ShaderRegister = 0; //レジスタ番号0とバインド
-
-	//rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; //CBVを使う
-	//rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; //VertexShaderで使う
-	//rootParameters[1].Descriptor.ShaderRegister = 0; //レジスタ番号0を使う
-
-	////-------------------------------------
-	////DescriptorTableを作成
-	////-------------------------------------
-	////DescriptorRangeをまとめたもの
-	//rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
-	//rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	//rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
-	//rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
-
-	////-------------------------------------
-	////平行光源をShaderで使う
-	////-------------------------------------
-	//rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
-	//rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	//rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号１を使う
-
-	////-------------------------------------
-	////Samplerの設定
-	////-------------------------------------
-
-	//D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	//staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//バイリニアフィルタ
-	//staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//0~1の範囲外をリピート
-	//staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	//staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-	//staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//比較しない
-	//staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipmapを使う
-	//staticSamplers[0].ShaderRegister = 0;//レジスタ番号0を使う
-	//staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	//descriptionRootSignature.pStaticSamplers = staticSamplers;
-	//descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-	//descriptionRootSignature.pParameters = rootParameters; //ルートパラメータ配列へのポインタ
-	//descriptionRootSignature.NumParameters = _countof(rootParameters); //配列の長さ
-
-	////シリアライズしてバイナリする
-	//ID3DBlob* signatureBlob = nullptr;
-	//ID3DBlob* errorBlob = nullptr;
-
-	//hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	//if (FAILED(hr)) {
-	//	Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-	//	assert(false);
-	//}
-
-	////バイナリを元に作成
-	//Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-	//hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
-	//assert(SUCCEEDED(hr));
-
-
-	////-------------------------------------
-	////InputLayoutを作成
-	////-------------------------------------
-	////VertexShaderへ渡す頂点データがどのようなものかを指定するオブジェクト
-
-	////InputLayoutの設定
-	//D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
-	//inputElementDescs[0].SemanticName = "POSITION";
-	//inputElementDescs[0].SemanticIndex = 0;
-	//inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	//inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	//inputElementDescs[1].SemanticName = "TEXCOORD";
-	//inputElementDescs[1].SemanticIndex = 0;
-	//inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	//inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	//inputElementDescs[2].SemanticName = "NORMAL";
-	//inputElementDescs[2].SemanticIndex = 0;
-	//inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	//inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-
-	//D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	//inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	//inputLayoutDesc.NumElements = _countof(inputElementDescs);
-
-	////-------------------------------------
-	////BlendStateを作成
-	////-------------------------------------
-	////PixelShaderからの出力を画面にどのように書き込むかを設定する項目
-
-	////BlendStateの設定
-	//D3D12_BLEND_DESC blendDesc{};
-	////すべての色要素を書き込む
-	//blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-	////-------------------------------------
-	////RasterizerStateを作成
-	////-------------------------------------
-	////Rasterizerに対する設定
-
-	////RasterizerStateの設定
-	//D3D12_RASTERIZER_DESC rasterizerDesc{};
-
-	////裏面（時計回り）を表示しない（ピクセルにしない）
-	//rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	////三角形の中を塗りつぶす
-	//rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-	////-------------------------------------
-	////ShaderをCompilerする
-	////-------------------------------------
-
-	////Shaderをコンパイラする
-	//IDxcBlob* vertexShaderBlob = CompileShader(L"Resources/shaders/Object3D.VS.hlsl", L"vs_6_0", dxcUtils, dxcCompiler, includeHandler);
-	//assert(vertexShaderBlob != nullptr);
-
-	//IDxcBlob* pixelShaderBlob = CompileShader(L"Resources/shaders/Object3D.PS.hlsl", L"ps_6_0", dxcUtils, dxcCompiler, includeHandler);
-	//assert(pixelShaderBlob != nullptr);
-
-
-	////-------------------------------------
-	////DepthStencilState
-	////-------------------------------------
-
-	////DepthStencilStateの設定
-	//D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	////Depthの機能を有効化する
-	//depthStencilDesc.DepthEnable = true;
-	////書き込みします
-	//depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	////比較関数はLessEqual。つまり、近ければ描画される
-	//depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-
-
-	////-------------------------------------
-	////PSOを生成する
-	////-------------------------------------
-
-	//D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	//graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();//RootSignature
-	//graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayer
-	//graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),vertexShaderBlob->GetBufferSize() };//VertexShader
-	//graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),pixelShaderBlob->GetBufferSize() };//PixelShader
-	//graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
-	//graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
-	//graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;//depthStencilState
-	////書き込むRTVの情報
-	//graphicsPipelineStateDesc.NumRenderTargets = 1;
-	//graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	//graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	////利用するトポロジ（形状）のタイプ。三角形
-	//graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	////どのように画面に色を打ち込むかの設定（気にしない）
-	//graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	//graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	////実際に生成
-	//Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
-	//hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
-	//assert(SUCCEEDED(hr));
-
-	////-------------------------------------
-	////ModelDataを使ったResourceの作成
-	////-------------------------------------
-
-	////モデル読み込み
-	//ModelData modelData = LoadObjFile("resource", "axis.obj");
-	////頂点リソースを作る
-	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device, sizeof(VertexData) * modelData.vertices.size());
-	////頂点バッファビューを作成する
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	////リソースの先頭アドレスから使う
-	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	////使用するリソースのサイズは頂点のサイズ
-	//vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
-	////１頂点当たりのサイズ
-	//vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-	////頂点リソースにデータを書き込む
-	//VertexData* vertexData = nullptr;
-	////書き込むためのアドレスを取得
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	////頂点データをリソースにコピー
-	//std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-
-	////-------------------------------------
-	////矩形を描画するためのVertexResource
-	////-------------------------------------
-
-	////Sprite用の頂点リソースを作る
-	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite = CreateBufferResource(device, sizeof(VertexData) * 4);
-
-	////-------------------------------------
-	////矩形を描画するためのVertexBufferView
-	////-------------------------------------
-
-	////頂点バッファビューを作成する
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
-	////リソースの先頭アドレスから使う
-	//vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
-	////使用するリソースのサイズは頂点６つ分のサイズ
-	//vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
-	////１頂点分のサイズ
-	//vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
-
-	////-------------------------------------
-	////矩形の頂点データを設定する
-	////-------------------------------------
-
-	//VertexData* vertexDataSprite = nullptr;
-	//vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
-	////１枚目の三角形
-	////左下
-
-	//vertexDataSprite[0].position = { 0.0f,360.f,0.0f,1.0f };
-	//vertexDataSprite[0].texcoord = { 0.0f,1.0f };
-	//vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
-	////左上
-	//vertexDataSprite[1].position = { 0.0f,0.0f,0.0f,1.0f };
-	//vertexDataSprite[1].texcoord = { 0.0f,0.0f };
-	//vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
-
-	////右下
-	//vertexDataSprite[2].position = { 640.f,360.f,0.0f,1.0f };
-	//vertexDataSprite[2].texcoord = { 1.0f,1.0f };
-	//vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
-
-	////右上
-	//vertexDataSprite[3].position = { 640.0f,0.0f,0.0f,1.0f };
-	//vertexDataSprite[3].texcoord = { 1.0f,0.0f };
-	//vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
-
-
-	////-------------------------------------
-	////矩形描画のindex版のResourceを作成
-	////-------------------------------------
-
-	//Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = CreateBufferResource(device, sizeof(uint32_t) * 6);
-	////Viewを作成
-	//D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
-	////リソースの先頭のアドレスから使う
-	//indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
-	////使用するリソースサイズはインデックス6つ分のサイズ
-	//indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
-	////インデックスはuint32_tとする
-	//indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
-
-	////-------------------------------------
-	////インデックスリソースにデータを書き込む
-	////-------------------------------------
-	//uint32_t* indexDataSprite = nullptr;
-	//indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
-	////左下
-	//indexDataSprite[0] = 0;
-	////左上
-	//indexDataSprite[1] = 1;
-	////右下
-	//indexDataSprite[2] = 2;
-	////左上
-	//indexDataSprite[3] = 1;
-	////右上
-	//indexDataSprite[4] = 3;
-	////右下
-	//indexDataSprite[5] = 2;
-
-	////-------------------------------------
- //   //Material用のResourceを作る
- //   //-------------------------------------
-
-	////マテリアル用のリソースを作る。今回はcolor１つ分のサイズを用意する
-	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device, sizeof(Material));
-	////マテリアルにデータを書き込む
-	//Material* materialData = nullptr;
-	////書き込むためのアドレスを取得
-	//materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
-	////今回は白を書き込み
-	//materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//materialData->enableLighting = true;
-	////単位行列で初期化
-	//materialData->uvTransform = MakeIdentity4x4();
-
-	////-------------------------------------
-	////Splite用のマテリアルを作成して利用する
-	////-------------------------------------
-
-	////Sprite用のパーティクルマテリアルリソースを作る
-	//Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = CreateBufferResource(device, sizeof(Material));
-	////マテリアルにデータを書き込む
-	//Material* materialDataSprite = nullptr;
-	////書き込むためのアドレスを取得
-	//materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
-	////今回は白を書き込み
-	//materialDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	////SpriteはLightingしないのでfalseを設定する
-	//materialDataSprite->enableLighting = false;
-	////単位行列で初期化
-	//materialDataSprite->uvTransform = MakeIdentity4x4();
-
-	////-------------------------------------
-	////平行光源用のResourceを作成
-	////-------------------------------------
-
-	//Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = CreateBufferResource(device, sizeof(DirectionalLight));
-	//DirectionalLight* directionalLightData = nullptr;
-	//directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-	////デフォルトの値は以下にしておく
-	//directionalLightData->color = { 1.0f,1.0f,1.0f };
-	//directionalLightData->direction = Normalize({ 0.0f,-1.0f,0.0f });
-	//directionalLightData->intensity = 1.0f;
-
-	////-------------------------------------
-	////TransformationMatrix用のResourceを作る
-	////-------------------------------------
-
-	////WVP用のリソースを作る。Matrix4x4　１つ分のサイズを用意する
-	//Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = CreateBufferResource(device, sizeof(TransformMatrix));
-	////データを書き込む
-	//TransformMatrix* wvpData = nullptr;
-	////書き込むためのアドレスを取得
-	//wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
-	////単位行列を書き込んでおく
-	//wvpData->WVP = MakeIdentity4x4();
-	//wvpData->World = MakeIdentity4x4();
-
-	////-------------------------------------
-	////Transformを使ってCBufferを更新する
-	////-------------------------------------
-	////Transform変数を作る
-	//Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-
-	////-------------------------------------
-	////uvTransform用の変数を用意
-	////-------------------------------------
-
-	//Transform uvTransformSprite{
-	//	{1.0f,1.0f,1.f},
-	//	{0.0f,0.0f,0.0f},
-	//	{0.0f,0.0f,0.0f},
-	//};
-
-	////-------------------------------------
-	////VertexShaderで利用するtransformationMatrix用のResourceを作成
-	////-------------------------------------
-	////Sprite用のTransformationMatrix用のリソースを作る
-	////Matrix4x4１つ分のサイズを用意する
-	//Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = CreateBufferResource(device, sizeof(TransformMatrix));
-	////データを書き込む
-	//TransformMatrix* transformationMatrixDataSprite = nullptr;
-	////書き込むためのアドレスを取得する
-	//transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
-	////単位行列を書き込んでおく
-	//transformationMatrixDataSprite->WVP = MakeIdentity4x4();
-	//transformationMatrixDataSprite->World = MakeIdentity4x4();
-	////CPUで動かす用のTransformを作る
-	//Transform transformSprite{ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
-
-	////-------------------------------------
- //   //WVPMatrixを作って書き込む
-	////-------------------------------------
-
-	////Sprite用のWorldViewProjectionMatrixを作る
-	//Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
-	//Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
-	//Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
-	//Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-	//transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
-	//transformationMatrixDataSprite->World = worldMatrixSprite;
-
-	////-------------------------------------
-	////WorldViewProjectionMatrixを作る
-	////-------------------------------------
-	//
-	////zが-５の位置でｚ+の方向を向いているカメラ
-	//Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
-
-
-	////-------------------------------------
- //   //Textureを読んで転送する
- //   //-------------------------------------
-
-	//DirectX::ScratchImage mipImages = LoadTexture("resource/uvChecker.png");
-	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = CreateTextureResource(device, metadata);
-	//UploadTextureData(textureResource, mipImages);
-
-	////-------------------------------------
-	////二枚目のTextureを読んで転送する
-	////-------------------------------------
-
-	////DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
-	//DirectX::ScratchImage mipImages2 = LoadTexture("resource/uvChecker.png");
-	//const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = CreateTextureResource(device, metadata2);
-	//UploadTextureData(textureResource2, mipImages2);
-
-	////-------------------------------------
- //   //ShaderResourceViewを作る
- //   //-------------------------------------
-
-	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	//srvDesc.Format = metadata.format;
-	//srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	//srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	//srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	////SRVを作成するDescriptorHeapの場所を決める
-	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-
-	////先頭はImGuiが使っているのでその次を使う
-	//textureSrvHandleCPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	//textureSrvHandleGPU.ptr += device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	////SRVの生成
-	//device->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-
-	////-------------------------------------
-	////二枚目のShaderResourceViewを作る
-	////-------------------------------------
-
-	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
-	//srvDesc2.Format = metadata2.format;
-	//srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	//srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//２Dテクスチャ
-	//srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
-
-	////SRVを作成するDescriptorHeapの場所を決める
-	////index = 2の位置にDescriptorを作成する
-	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(srvDescriptorHeap, descriptorSizeSRV, 2);
-
-	////SRVの生成
-	//device->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
-
-	////-------------------------------------
-	////ImGuiの初期化
-	////-------------------------------------
-	//IMGUI_CHECKVERSION();
-	//ImGui::CreateContext();
-	//ImGui::StyleColorsDark();
-	//ImGui_ImplWin32_Init(winApp->GetHwnd());
-	//ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap.Get(), srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-	//
-	////テクスチャ切り替え用のbool変数
-	//bool useMonsterBall = true;
+	//-------------------------------------
+	//ここからPSOの作成
+	//-------------------------------------
+
+	//-------------------------------------
+	//DescriptorRangeを作成
+	//-------------------------------------
+	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
+	descriptorRange[0].BaseShaderRegister = 0;//0から始まる
+	descriptorRange[0].NumDescriptors = 1;//数は1つ
+	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;//SRVを使う
+	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
+
+	//-------------------------------------
+	//RootSignatureを作成
+	//-------------------------------------
+	//ShaderとResourceをどのように関連付けるかを示したオブジェクト
+
+	//RootSignature作成
+	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
+	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+	//RootParameter作成。複数設定できるので配列。今回はPixelShaderのMaterialとVertexShaderのTransform
+	D3D12_ROOT_PARAMETER rootParameters[4] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; //CBVを使う
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //PixelShaderで使う
+	rootParameters[0].Descriptor.ShaderRegister = 0; //レジスタ番号0とバインド
+
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV; //CBVを使う
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; //VertexShaderで使う
+	rootParameters[1].Descriptor.ShaderRegister = 0; //レジスタ番号0を使う
+
+	//-------------------------------------
+	//DescriptorTableを作成
+	//-------------------------------------
+	//DescriptorRangeをまとめたもの
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
+	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
+
+	//-------------------------------------
+	//平行光源をShaderで使う
+	//-------------------------------------
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
+	rootParameters[3].Descriptor.ShaderRegister = 1;//レジスタ番号１を使う
+
+	//-------------------------------------
+	//Samplerの設定
+	//-------------------------------------
+
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;//バイリニアフィルタ
+	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;//0~1の範囲外をリピート
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;//比較しない
+	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipmapを使う
+	staticSamplers[0].ShaderRegister = 0;//レジスタ番号0を使う
+	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
+	descriptionRootSignature.pStaticSamplers = staticSamplers;
+	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
+
+	descriptionRootSignature.pParameters = rootParameters; //ルートパラメータ配列へのポインタ
+	descriptionRootSignature.NumParameters = _countof(rootParameters); //配列の長さ
+
+	//シリアライズしてバイナリする
+	ID3DBlob* signatureBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
+
+	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		Logger::Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+
+	//バイナリを元に作成
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	hr = dxCommon->GetDevice()->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(&rootSignature));
+	assert(SUCCEEDED(hr));
+
+
+	//-------------------------------------
+	//InputLayoutを作成
+	//-------------------------------------
+	//VertexShaderへ渡す頂点データがどのようなものかを指定するオブジェクト
+
+	//InputLayoutの設定
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	inputElementDescs[0].SemanticName = "POSITION";
+	inputElementDescs[0].SemanticIndex = 0;
+	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	inputElementDescs[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[1].SemanticName = "TEXCOORD";
+	inputElementDescs[1].SemanticIndex = 0;
+	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	inputElementDescs[2].SemanticName = "NORMAL";
+	inputElementDescs[2].SemanticIndex = 0;
+	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
+	inputLayoutDesc.pInputElementDescs = inputElementDescs;
+	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+
+	//-------------------------------------
+	//BlendStateを作成
+	//-------------------------------------
+	//PixelShaderからの出力を画面にどのように書き込むかを設定する項目
+
+	//BlendStateの設定
+	D3D12_BLEND_DESC blendDesc{};
+	//すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	//-------------------------------------
+	//RasterizerStateを作成
+	//-------------------------------------
+	//Rasterizerに対する設定
+
+	//RasterizerStateの設定
+	D3D12_RASTERIZER_DESC rasterizerDesc{};
+
+	//裏面（時計回り）を表示しない（ピクセルにしない）
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	//三角形の中を塗りつぶす
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+
+	//-------------------------------------
+	//ShaderをCompilerする
+	//-------------------------------------
+
+	//Shaderをコンパイラする
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = dxCommon->CompileShader(L"Resources/shaders/Object3D.VS.hlsl", L"vs_6_0");
+	assert(vertexShaderBlob != nullptr);
+
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = dxCommon->CompileShader(L"Resources/shaders/Object3D.PS.hlsl", L"ps_6_0");
+	assert(pixelShaderBlob != nullptr);
+
+
+	//-------------------------------------
+	//DepthStencilState
+	//-------------------------------------
+
+	//DepthStencilStateの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
+	//Depthの機能を有効化する
+	depthStencilDesc.DepthEnable = true;
+	//書き込みします
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	//比較関数はLessEqual。つまり、近ければ描画される
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+
+	//-------------------------------------
+	//PSOを生成する
+	//-------------------------------------
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
+	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();//RootSignature
+	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayer
+	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),vertexShaderBlob->GetBufferSize() };//VertexShader
+	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),pixelShaderBlob->GetBufferSize() };//PixelShader
+	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
+	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
+	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;//depthStencilState
+	//書き込むRTVの情報
+	graphicsPipelineStateDesc.NumRenderTargets = 1;
+	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//利用するトポロジ（形状）のタイプ。三角形
+	graphicsPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	//どのように画面に色を打ち込むかの設定（気にしない）
+	graphicsPipelineStateDesc.SampleDesc.Count = 1;
+	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+	//実際に生成
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+	hr = dxCommon->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&graphicsPipelineState));
+	assert(SUCCEEDED(hr));
+
+	//-------------------------------------
+	//ModelDataを使ったResourceの作成
+	//-------------------------------------
+
+	//モデル読み込み
+	ModelData modelData = LoadObjFile("resource", "axis.obj");
+	//頂点リソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = dxCommon->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
+	//頂点バッファビューを作成する
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	//リソースの先頭アドレスから使う
+	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズは頂点のサイズ
+	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
+	//１頂点当たりのサイズ
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+	//頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	//書き込むためのアドレスを取得
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	//頂点データをリソースにコピー
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+
+	//-------------------------------------
+	//矩形を描画するためのVertexResource
+	//-------------------------------------
+
+	//Sprite用の頂点リソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResourceSprite = dxCommon->CreateBufferResource(sizeof(VertexData) * 4);
+
+	//-------------------------------------
+	//矩形を描画するためのVertexBufferView
+	//-------------------------------------
+
+	//頂点バッファビューを作成する
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferViewSprite{};
+	//リソースの先頭アドレスから使う
+	vertexBufferViewSprite.BufferLocation = vertexResourceSprite->GetGPUVirtualAddress();
+	//使用するリソースのサイズは頂点６つ分のサイズ
+	vertexBufferViewSprite.SizeInBytes = sizeof(VertexData) * 4;
+	//１頂点分のサイズ
+	vertexBufferViewSprite.StrideInBytes = sizeof(VertexData);
+
+	//-------------------------------------
+	//矩形の頂点データを設定する
+	//-------------------------------------
+
+	VertexData* vertexDataSprite = nullptr;
+	vertexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSprite));
+	//１枚目の三角形
+	//左下
+
+	vertexDataSprite[0].position = { 0.0f,360.f,0.0f,1.0f };
+	vertexDataSprite[0].texcoord = { 0.0f,1.0f };
+	vertexDataSprite[0].normal = { 0.0f,0.0f,-1.0f };
+	//左上
+	vertexDataSprite[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexDataSprite[1].texcoord = { 0.0f,0.0f };
+	vertexDataSprite[1].normal = { 0.0f,0.0f,-1.0f };
+
+	//右下
+	vertexDataSprite[2].position = { 640.f,360.f,0.0f,1.0f };
+	vertexDataSprite[2].texcoord = { 1.0f,1.0f };
+	vertexDataSprite[2].normal = { 0.0f,0.0f,-1.0f };
+
+	//右上
+	vertexDataSprite[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexDataSprite[3].texcoord = { 1.0f,0.0f };
+	vertexDataSprite[3].normal = { 0.0f,0.0f,-1.0f };
+
+
+	//-------------------------------------
+	//矩形描画のindex版のResourceを作成
+	//-------------------------------------
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResourceSprite = dxCommon->CreateBufferResource(sizeof(uint32_t) * 6);
+	//Viewを作成
+	D3D12_INDEX_BUFFER_VIEW indexBufferViewSprite{};
+	//リソースの先頭のアドレスから使う
+	indexBufferViewSprite.BufferLocation = indexResourceSprite->GetGPUVirtualAddress();
+	//使用するリソースサイズはインデックス6つ分のサイズ
+	indexBufferViewSprite.SizeInBytes = sizeof(uint32_t) * 6;
+	//インデックスはuint32_tとする
+	indexBufferViewSprite.Format = DXGI_FORMAT_R32_UINT;
+
+	//-------------------------------------
+	//インデックスリソースにデータを書き込む
+	//-------------------------------------
+	uint32_t* indexDataSprite = nullptr;
+	indexResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
+	//左下
+	indexDataSprite[0] = 0;
+	//左上
+	indexDataSprite[1] = 1;
+	//右下
+	indexDataSprite[2] = 2;
+	//左上
+	indexDataSprite[3] = 1;
+	//右上
+	indexDataSprite[4] = 3;
+	//右下
+	indexDataSprite[5] = 2;
+
+	//-------------------------------------
+    //Material用のResourceを作る
+    //-------------------------------------
+
+	//マテリアル用のリソースを作る。今回はcolor１つ分のサイズを用意する
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = dxCommon->CreateBufferResource(sizeof(Material));
+	//マテリアルにデータを書き込む
+	Material* materialData = nullptr;
+	//書き込むためのアドレスを取得
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+	//今回は白を書き込み
+	materialData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	materialData->enableLighting = true;
+	//単位行列で初期化
+	materialData->uvTransform = MyMath::MakeIdentity4x4();
+
+	//-------------------------------------
+	//Splite用のマテリアルを作成して利用する
+	//-------------------------------------
+
+	//Sprite用のパーティクルマテリアルリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResourceSprite = dxCommon->CreateBufferResource(sizeof(Material));
+	//マテリアルにデータを書き込む
+	Material* materialDataSprite = nullptr;
+	//書き込むためのアドレスを取得
+	materialResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSprite));
+	//今回は白を書き込み
+	materialDataSprite->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	//SpriteはLightingしないのでfalseを設定する
+	materialDataSprite->enableLighting = false;
+	//単位行列で初期化
+	materialDataSprite->uvTransform = MyMath::MakeIdentity4x4();
+
+	//-------------------------------------
+	//平行光源用のResourceを作成
+	//-------------------------------------
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = dxCommon->CreateBufferResource(sizeof(DirectionalLight));
+	DirectionalLight* directionalLightData = nullptr;
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	//デフォルトの値は以下にしておく
+	directionalLightData->color = { 1.0f,1.0f,1.0f };
+	directionalLightData->direction = MyMath::Normalize({ 0.0f,-1.0f,0.0f });
+	directionalLightData->intensity = 1.0f;
+
+	//-------------------------------------
+	//TransformationMatrix用のResourceを作る
+	//-------------------------------------
+
+	//WVP用のリソースを作る。Matrix4x4　１つ分のサイズを用意する
+	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource = dxCommon->CreateBufferResource(sizeof(TransformMatrix));
+	//データを書き込む
+	TransformMatrix* wvpData = nullptr;
+	//書き込むためのアドレスを取得
+	wvpResource->Map(0, nullptr, reinterpret_cast<void**>(&wvpData));
+	//単位行列を書き込んでおく
+	wvpData->WVP = MyMath::MakeIdentity4x4();
+	wvpData->World = MyMath::MakeIdentity4x4();
+
+	//-------------------------------------
+	//Transformを使ってCBufferを更新する
+	//-------------------------------------
+	//Transform変数を作る
+	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+	//-------------------------------------
+	//uvTransform用の変数を用意
+	//-------------------------------------
+
+	Transform uvTransformSprite{
+		{1.0f,1.0f,1.f},
+		{0.0f,0.0f,0.0f},
+		{0.0f,0.0f,0.0f},
+	};
+
+	//-------------------------------------
+	//VertexShaderで利用するtransformationMatrix用のResourceを作成
+	//-------------------------------------
+	//Sprite用のTransformationMatrix用のリソースを作る
+	//Matrix4x4１つ分のサイズを用意する
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = dxCommon->CreateBufferResource(sizeof(TransformMatrix));
+	//データを書き込む
+	TransformMatrix* transformationMatrixDataSprite = nullptr;
+	//書き込むためのアドレスを取得する
+	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
+	//単位行列を書き込んでおく
+	transformationMatrixDataSprite->WVP = MyMath::MakeIdentity4x4();
+	transformationMatrixDataSprite->World = MyMath::MakeIdentity4x4();
+	//CPUで動かす用のTransformを作る
+	Transform transformSprite{ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
+
+	//-------------------------------------
+    //WVPMatrixを作って書き込む
+	//-------------------------------------
+
+	//Sprite用のWorldViewProjectionMatrixを作る
+	Matrix4x4 worldMatrixSprite = MyMath::MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
+	Matrix4x4 viewMatrixSprite = MyMath::MakeIdentity4x4();
+	Matrix4x4 projectionMatrixSprite = MyMath::MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrixSprite = MyMath::Multiply(worldMatrixSprite, MyMath::Multiply(viewMatrixSprite, projectionMatrixSprite));
+	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
+	transformationMatrixDataSprite->World = worldMatrixSprite;
+
+	//-------------------------------------
+	//WorldViewProjectionMatrixを作る
+	//-------------------------------------
+	
+	//zが-５の位置でｚ+の方向を向いているカメラ
+	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+
+
+	//-------------------------------------
+    //Textureを読んで転送する
+    //-------------------------------------
+
+	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resource/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
+	dxCommon->UploadTextureData(textureResource, mipImages);
+
+	//-------------------------------------
+	//二枚目のTextureを読んで転送する
+	//-------------------------------------
+
+	//DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
+	DirectX::ScratchImage mipImages2 = dxCommon->LoadTexture("resource/uvChecker.png");
+	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = dxCommon->CreateTextureResource(metadata2);
+	dxCommon->UploadTextureData(textureResource2, mipImages2);
+
+	//-------------------------------------
+    //ShaderResourceViewを作る
+    //-------------------------------------
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	srvDesc.Format = metadata.format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	//SRVを作成するDescriptorHeapの場所を決める
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxCommon->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+
+	//先頭はImGuiが使っているのでその次を使う
+	textureSrvHandleCPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	//SRVの生成
+	dxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+
+	//-------------------------------------
+	//二枚目のShaderResourceViewを作る
+	//-------------------------------------
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	srvDesc2.Format = metadata2.format;
+	srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//２Dテクスチャ
+	srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+
+	//SRVを作成するDescriptorHeapの場所を決める
+	//index = 2の位置にDescriptorを作成する
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
+
+	//SRVの生成
+	dxCommon->GetDevice()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+
+	//-------------------------------------
+	//ImGuiの初期化
+	//-------------------------------------
+	/*IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(winApp->GetHwnd());
+	ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap.Get(), srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());*/
+	
+	//テクスチャ切り替え用のbool変数
+	bool useMonsterBall = true;
 
 	
 	
@@ -911,45 +897,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------		
 		
 		//RootSignatureを設定。PSOに設定してるけど別途設定が必要
-		commandList->SetGraphicsRootSignature(rootSignature.Get());
-		commandList->SetPipelineState(graphicsPipelineState.Get());//PSOを設定
-		commandList->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
+		dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
+		dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());//PSOを設定
+		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
 		//形状を設定。PSOに設定してるものとはまた別。同じものを設定すると考えておけばいい
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		//マテリアルCBufferの場所を設定
-		commandList->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
 
 		//wvp用のCBufferの場所を設定
 		//RootParameter[1]に対してCBVの設定
-		commandList->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 
-		commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 		//SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
 		//変数を見て利用するSRVを決める。チェックがはいいているとき（=true）のとき、モンスターボールを使い、falseのときはuvCheckerを使う
-		commandList->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
+		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
 
 		//描画！（DrawCall/ドローコール）。３頂点で１つのインスタンス。
 		//commandList->DrawInstanced(static_cast<size_t>(kSubdivision * kSubdivision) * 6, 1, 0, 0);
-		commandList->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
 
 		//-------------------------------------
 		//矩形の描画コマンドを積む
 		//-------------------------------------
 	   //Spriteの描画。変更が必要なものだけ変更する
-		commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);//VBVを設定する
-		commandList->IASetIndexBuffer(&indexBufferViewSprite);//IBVを設定
+		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);//VBVを設定する
+		dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);//IBVを設定
 
 		//マテリアルCBufferの場所を設定
-		commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
 		//TransformationMatrixCBufferの場所を設定する
-		commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
 
 		//SpriteはuvCheckerを使うようにする
-		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
-		commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 		//描画！（DrawCall/ドローコール)
 		//commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -960,7 +946,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 
 		//実際のcommandListのImGuiの描画コマンドを積む
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
 		
 		//-------------------------------------
 		// 描画後処理
