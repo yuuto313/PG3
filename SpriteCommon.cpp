@@ -184,7 +184,7 @@ void SpriteCommon::CreateGraphicsPipeline()
 	CreateRootSignature();
 
 	//-------------------------------------
-	//PSOを生成する
+	// PSOを生成する
 	//-------------------------------------
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
