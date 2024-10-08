@@ -64,14 +64,6 @@ typedef struct {
 	float intensity;//輝度
 }DirectionalLight;
 
-//Transform情報を作る
-typedef struct  
-{
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-}Transform;
-
 //MaterialData構造体
 typedef struct {
 	std::string textureFilePath;
@@ -703,6 +695,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 	//Transformを使ってCBufferを更新する
 	//-------------------------------------
+	
 	//Transform変数を作る
 	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
@@ -719,9 +712,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 	//VertexShaderで利用するtransformationMatrix用のResourceを作成
 	//-------------------------------------
+	
 	//Sprite用のTransformationMatrix用のリソースを作る
 	//Matrix4x4１つ分のサイズを用意する
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = dxCommon->CreateBufferResource(sizeof(TransformMatrix));
+
 	//データを書き込む
 	TransformMatrix* transformationMatrixDataSprite = nullptr;
 	//書き込むためのアドレスを取得する
@@ -822,8 +817,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//テクスチャ切り替え用のbool変数
 	bool useMonsterBall = true;
 
-	
-	
 	while (true) {
 		//Windowのメッセージ処理
 		if (winApp->ProcessMessage()) {
@@ -947,7 +940,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 		//矩形の描画コマンドを積む
 		//-------------------------------------
-	   //Spriteの描画。変更が必要なものだけ変更する
+		
+	    //Spriteの描画。変更が必要なものだけ変更する
 		dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);//VBVを設定する
 		dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewSprite);//IBVを設定
 

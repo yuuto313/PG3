@@ -4,35 +4,12 @@
 #include <cstdint>
 #include <format>
 
-//-------------------------------------
-// 構造体
-//-------------------------------------
-
-struct Vector2 final{
-	float x;
-	float y;
-};
-
-struct Vector3 final{
-	float x;
-	float y;
-	float z;
-};
-
-struct Vector4 final{
-	float x;
-	float y;
-	float z;
-	float w;
-};
-
-struct Matrix3x3 final{
-	float m[3][3];
-};
-
-struct Matrix4x4 final{
-	float m[4][4];
-};
+#include "MyVector2.h"
+#include "MyVector3.h"
+#include "MyVector4.h"
+#include "MyMatrix3x3.h"
+#include "MyMatrix4x4.h"
+#include "MyTransform.h"
 
 //-------------------------------------
 // 数学関数
