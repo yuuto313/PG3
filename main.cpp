@@ -897,8 +897,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 		//ライトの向きを正規化
 		//-------------------------------------
-		directionalLightData->direction = MyMath::Normalize(directionalLightData->direction);
 
+		directionalLightData->direction = MyMath::Normalize(directionalLightData->direction);
 		
 		//-------------------------------------
 		// 描画前処理

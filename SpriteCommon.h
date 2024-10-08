@@ -25,7 +25,6 @@ public:
 
 	DirectXCommon* GetDxCommon()const { dxCommon_; }
 
-
 private:
 
 	//-------------メンバ変数-------------//
