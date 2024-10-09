@@ -33,13 +33,21 @@ private:
 
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_;
 
+	D3D12_DESCRIPTOR_RANGE descriptorRange_[1] = {};
+	D3D12_ROOT_PARAMETER rootParameters_[4] = {};
+	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
+	ID3DBlob* signatureBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
+
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc_{};
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob_;
 	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob_;
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[3] = {};
 	D3D12_BLEND_DESC blendDesc_{};
 	D3D12_RASTERIZER_DESC rasterizerDesc_{};
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_;
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_{};
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_;
 
 	//-------------メンバ関数-------------//
