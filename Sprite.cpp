@@ -124,7 +124,6 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
 	// VBVを設定する
 	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	
-
 	//-------------------------------------
 	// IndexBufferViewを設定
 	//-------------------------------------

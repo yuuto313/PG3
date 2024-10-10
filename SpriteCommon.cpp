@@ -21,9 +21,6 @@ void SpriteCommon::Draw()
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());//PSOを設定
 	//形状を設定。PSOに設定してるものとはまた別。同じものを設定すると考えておけばいい
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	
-	// 後々？
-	//dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);//VBVを設定
 }
 
 void SpriteCommon::CreateRootSignature()
