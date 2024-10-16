@@ -223,8 +223,6 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	InitializeScissorRect();
 	// DCXコンパイラの生成
 	InitializeDXCCompiler();
-	// ImGuiの初期化
-	InitializeImGui();
 }
 
 void DirectXCommon::PreDraw()
@@ -745,20 +743,6 @@ void DirectXCommon::InitializeDXCCompiler()
 	// 現時点でincludeはしないが、includeに対応するための設定を行っておく
 	result = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
 	assert(SUCCEEDED(result));
-}
-
-void DirectXCommon::InitializeImGui()
-{
-	//-------------------------------------
-	// ImGuiの初期化
-	//-------------------------------------
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp_->GetHwnd());
-	ImGui_ImplDX12_Init(device_.Get(), swapChainDesc_.BufferCount, rtvDesc_.Format, srvDescriptorHeap_.Get(), srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
-
 }
 
 void DirectXCommon::InitializeFixFPS()

@@ -100,6 +100,18 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList_.Get(); }
 
 	/// <summary>
+	/// swapChainDescの取得
+	/// </summary>
+	/// <returns></returns>
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
+
+	/// <summary>
+	/// RTVDescの取得
+	/// </summary>
+	/// <returns></returns>
+	D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() { return rtvDesc_; }
+
+	/// <summary>
 	/// SRVの指定番号のCPUデスクリプタハンドルを取得する
 	/// </summary>
 	/// <param name="index"></param>
@@ -253,11 +265,6 @@ private:
 	/// </summary>
 	/// <param name="result"></param>
 	void  InitializeDXCCompiler();
-
-	/// <summary>
-	/// ImGuiの初期化
-	/// </summary>
-	void InitializeImGui();
 
 	/// <summary>
 	/// FPS固定初期化

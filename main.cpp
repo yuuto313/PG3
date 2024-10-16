@@ -16,11 +16,6 @@
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
 
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 #include "externals/DirectXTex/DirectXTex.h"
 
 #include <fstream>
@@ -31,6 +26,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "Input.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
+#include "ImGuiManager.h"
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "Logger.h"
@@ -245,6 +241,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Input* input = nullptr;
 	WinApp* winApp = nullptr;
 	DirectXCommon* dxCommon = nullptr;
+	ImGuiManager* imguiManager = nullptr;
 	SpriteCommon* spriteCommon = nullptr;	
 	Sprite* sprite = nullptr;
 
@@ -276,6 +273,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
+
+	//-------------------------------------
+	// ImGuiの初期化
+	//-------------------------------------
+
+	imguiManager = new ImGuiManager();
+	imguiManager->Initialize(dxCommon, winApp);
 
 	//-------------------------------------
 	// スプライト共通部の初期化
@@ -472,12 +476,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 
 		//-------------------------------------
-		//入力処理の更新
+		// 入力処理の更新
 		//-------------------------------------
 
 		input->Update();
 		
-
+		//-------------------------------------
+		// スプライトの更新
+		//-------------------------------------
 
 		sprite->Update();
 
@@ -493,15 +499,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 		//フレームの始まる旨を告げる
 		//-------------------------------------
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+		
+		imguiManager->Begin();
 
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
 		//-------------------------------------
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-		//ImGui::ShowDemoWindow();
+		
+		imguiManager->UpdateGameUI();
+
 		/*ImGui::DragFloat3("CameraTranslate", &cameraTransform.translate.x, 0.05f);
 		ImGui::SliderAngle("CameraRotateX", &cameraTransform.rotate.x);
 		ImGui::SliderAngle("CameraRotateY", &cameraTransform.rotate.y);
@@ -540,7 +547,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
 		//-------------------------------------
 
-		ImGui::Render();
+		imguiManager->End();
 
 		sprite->Draw(textureSrvHandleGPU);
 
@@ -594,8 +601,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 画面表示できるようにする
 		//-------------------------------------
 
-		//実際のcommandListのImGuiの描画コマンドを積む
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), dxCommon->GetCommandList());
+		imguiManager->Draw();
 		
 		//-------------------------------------
 		// 描画後処理
@@ -614,9 +620,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //-------------------------------------
 	//ImGuiの終了処理
 	//-------------------------------------
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	
+	imguiManager->Finalize();
 
 	//-------------------------------------
 	//WindowsAPIの終了処理
@@ -630,6 +635,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	delete sprite;
 	delete spriteCommon;
+	delete imguiManager;
 	delete dxCommon;
 	delete input;
 	delete winApp;

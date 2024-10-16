@@ -109,8 +109,8 @@ void Sprite::Update()
 	Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.f);
 
 	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
-	wvpData_->WVP = worldViewProjectionMatrix;
-	wvpData_->World = worldMatrix;
+	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	transformationMatrixData_->World = worldMatrix;
 
 }
 
@@ -144,7 +144,7 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
 	
 	//wvp用のCBufferの場所を設定
 	//RootParameter[1]に対してCBVの設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrix_->GetGPUVirtualAddress());
 
 	//-------------------------------------
 	// SRVのDescriptorTableの先頭を設定
@@ -283,20 +283,24 @@ void Sprite::CreateTrasnformationMatrixData()
 	// 座標変換行列リソースを作る
 	//-------------------------------------
 
-	wvpResource_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-
+	//wvpResource_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrix_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	
 	//-------------------------------------
 	// 座標変換行列リソースにデータを書き込むためのアドレスを取得してtransformationMatrixDataに割り当てる
 	//-------------------------------------
 
-	wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
+	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
+	transformationMatrix_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 
 	//-------------------------------------
 	// 単位行列を書き込んでおく
 	//-------------------------------------
 
 	//単位行列を書き込んでおく
-	wvpData_->WVP = MyMath::MakeIdentity4x4();
-	wvpData_->World = MyMath::MakeIdentity4x4();
+	//wvpData_->WVP = MyMath::MakeIdentity4x4();
+	//wvpData_->World = MyMath::MakeIdentity4x4();
+	transformationMatrixData_->WVP = MyMath::MakeIdentity4x4();
+	transformationMatrixData_->World = MyMath::MakeIdentity4x4();
 
 }
