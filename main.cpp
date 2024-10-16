@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <Windows.h>
-#include<time.h>
+#include <time.h>
+#include <functional>
 
 typedef void(*PFunc)(std::string);
 
@@ -51,25 +52,34 @@ void Judgement(std::string userInput) {
 	PrintResult(dice);
 }
 
-void SetTimeout(PFunc p, int second,std::string userInput) {
+void SetTimeout(std::function<void()> func, int second) {
 	// コールバック関数を呼び出す
 	Sleep(second * 1000);
 
-	p(userInput);
+	func();
 }
 
-int main(void) {
+int main(int argc,char* argv[]) {
 
+	// 結果を表示する間
 	int coolTime = 3;
 
 	std::string userInput = Reception();
 
-	// 関数ポインタを宣言
-	void (*pfunc)(std::string);
+	// ラムダ式
+	auto judgement = [=]() {
+		int dice = CalculateTheRoll();
+		if (dice % 2 == 0 && userInput == "偶数" || dice % 2 != 0 && userInput == "奇数") {
+			std::cout << "正解" << std::endl;
+		} else {
+			std::cout << "不正解" << std::endl;
+		}
 
-	pfunc = Judgement;
+		PrintResult(dice);
+		};
+
 	// 3秒待つようにセット
-	SetTimeout(pfunc, coolTime,userInput);
+	SetTimeout(judgement, coolTime);
 
 	return 0;
 }
