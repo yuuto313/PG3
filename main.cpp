@@ -474,6 +474,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームループを抜ける
 			break;
 		}
+		//-------------------------------------
+		//フレームの始まる旨を告げる
+		//-------------------------------------
+
+		imguiManager->Begin();
 
 		//-------------------------------------
 		// 入力処理の更新
@@ -495,12 +500,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeRotateZMatrix(uvTransformSprite.rotate.z));
 		uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeTranslateMatrix(uvTransformSprite.translate));
 		materialDataSprite->uvTransform = uvTransformMatrix;*/
-
-		//-------------------------------------
-		//フレームの始まる旨を告げる
-		//-------------------------------------
-		
-		imguiManager->Begin();
 
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う

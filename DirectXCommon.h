@@ -7,10 +7,10 @@
 #include <array>
 #include <string>
 #include <chrono>
+#include <vector>
 
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
 #include "externals/DirectXTex/DirectXTex.h"
+#include "externals/DirectXTex/d3dx12.h"
 
 #include "WinApp.h"
 
@@ -46,6 +46,15 @@ public:
 	/// <param name="metaData"></param>
 	/// <returns></returns>
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
+
+	/// <summary>
+	/// テクスチャデータの転送
+	/// </summary>
+	/// <param name="texture"></param>
+	/// <param name="mipImages"></param>
+	/// <returns></returns>
+	/*[[nodiscard]]*/
+	//Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 
 	/// <summary>
 	/// テクスチャデータの転送
@@ -151,6 +160,7 @@ private:
 	UINT64 fenceVal_ = 0;
 	HANDLE fenceEvent_;
 
+	D3D12_RESOURCE_BARRIER barrier_{};
 	D3D12_VIEWPORT viewport_{};
 	D3D12_RECT scissorRect_{};
 
@@ -264,7 +274,7 @@ private:
 	/// DXCコンパイラの生成
 	/// </summary>
 	/// <param name="result"></param>
-	void  InitializeDXCCompiler();
+	void InitializeDXCCompiler();
 
 	/// <summary>
 	/// FPS固定初期化

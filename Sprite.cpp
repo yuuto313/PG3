@@ -1,12 +1,22 @@
 #include "Sprite.h"
 #include "SpriteCommon.h"
 #include "WinApp.h"
+#include "ImGuiManager.h"
 
 void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->spriteCommon_ = spriteCommon;
 	dxCommon_ = dxCommon;
+
+	//-------------------------------------
+	// Transform情報を作る
+	//-------------------------------------
+
+	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+	//zが-５の位置でｚ+の方向を向いているカメラ
+	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
 
 	//-------------------------------------
 	// 頂点データ作成
@@ -36,70 +46,21 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
 
 void Sprite::Update()
 {
-	//-------------------------------------
-	// 頂点リソースにデータを書き込む(4点分)
-	//-------------------------------------
-
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	//１枚目の三角形
-	//左下
-
-	vertexData_[0].position = { 0.0f,360.f,0.0f,1.0f };
-	vertexData_[0].texcoord = { 0.0f,1.0f };
-	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
-	//左上
-	vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexData_[1].texcoord = { 0.0f,0.0f };
-	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
-
-	//右下
-	vertexData_[2].position = { 640.f,360.f,0.0f,1.0f };
-	vertexData_[2].texcoord = { 1.0f,1.0f };
-	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
-
-	//右上
-	vertexData_[3].position = { 640.0f,0.0f,0.0f,1.0f };
-	vertexData_[3].texcoord = { 1.0f,0.0f };
-	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
-
-	//-------------------------------------
-	// インデックスリソースにデータを書き込む(6個分)
-	//-------------------------------------
-
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	//左下
-	indexData_[0] = 0;
-	//左上
-	indexData_[1] = 1;
-	//右下
-	indexData_[2] = 2;
-	//左上
-	indexData_[3] = 1;
-	//右上
-	indexData_[4] = 3;
-	//右下
-	indexData_[5] = 2;
-
-	//-------------------------------------
-	// Transform情報を作る
-	//-------------------------------------
-
-	Transform transform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-
-	//zが-５の位置でｚ+の方向を向いているカメラ
-	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	ImGui::Begin("Sprite");
+	ImGui::SliderFloat3("transform", &transform_.translate.x, -10.0f, 10.0f);
+	ImGui::End();
 
 	//-------------------------------------
 	// TransformからWorldMatrixを作る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	//-------------------------------------
 	// ViewMatrixを作って単位行列を代入
 	//-------------------------------------
 
-	Matrix4x4 cameraMatrix = MyMath::MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	Matrix4x4 cameraMatrix = MyMath::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
 	Matrix4x4 viewMatrix = MyMath::Inverse(cameraMatrix);
 
 	//-------------------------------------
@@ -111,7 +72,6 @@ void Sprite::Update()
 	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
-
 }
 
 void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)

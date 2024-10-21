@@ -41,6 +41,9 @@ private:
 	SpriteCommon* spriteCommon_ = nullptr;
 	DirectXCommon* dxCommon_;
 
+	Transform transform_;
+	Transform cameraTransform_;
+
 	// バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;

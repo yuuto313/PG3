@@ -131,9 +131,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 
 	// 利用するHeapの設定。非常に特殊な運用。02_04で一般的なケース版がある
 	D3D12_HEAP_PROPERTIES heapProperties{};
+	//heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;// デフォルトで設定
 	heapProperties.Type = D3D12_HEAP_TYPE_CUSTOM;// 細かい設定を行う
-	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;// WriteBackポリシーでCPUにアクセス
+	heapProperties.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_WRITE_BACK;// WriteBackポリシーでCPUアクセス可能
 	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL_L0;// プロセッサの近くに配置
+
 
 	// Resourceの作成
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
@@ -143,6 +145,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 		D3D12_HEAP_FLAG_NONE,// Heapの特殊な設定、特になし
 		&resourceDesc,// Resourceの設定。初回のResourceState
 		D3D12_RESOURCE_STATE_GENERIC_READ,// Textureは基本読むだけ
+		//D3D12_RESOURCE_STATE_COPY_DEST,// データ転送される設定
 		nullptr,// Clear最適化、使わないのでnullptr
 		IID_PPV_ARGS(&resource)// 作成するResourceポインタへのポインタ
 	);
@@ -150,6 +153,34 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 	assert(SUCCEEDED(hr));
 	return resource;
 }
+
+//[[nodiscard]]
+//Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages)
+//{
+//	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
+//
+//	 PrepareUploadを利用して、読み込んだデータからDirectX12用のSubresourceの配列を作成する
+//	DirectX::PrepareUpload(device_.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
+//	 Subresourceの数を基に、コピー元となるintermediateResourceに必要なサイズを計算する
+//	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
+//	 計算したサイズでIntermediateResourceを作る
+//	 intermediateResource<中間リソース>
+//	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(intermediateSize);
+//
+//	 データ転送をコマンドに積む
+//	UpdateSubresources(commandList_.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
+//
+//	 Texutureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
+//	
+//	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+//	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+//	barrier_.Transition.pResource = texture.Get();
+//	barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+//	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+//	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
+//	commandList_->ResourceBarrier(1, &barrier_);
+//	return intermediateResource.Get();
+//}
 
 void DirectXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages)
 {
@@ -168,7 +199,6 @@ void DirectXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resourc
 			UINT(img->slicePitch)// １枚サイズ
 		);
 		assert(SUCCEEDED(hr));
-
 	}
 }
 
@@ -238,20 +268,18 @@ void DirectXCommon::PreDraw()
 	// リソースバリアで書き込み可能に変更
 	//--------------------------------
 
-	D3D12_RESOURCE_BARRIER barrier{};
-
 	// 今回のバリアはTransition
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	// Noneにしておく
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	// バリアを張る対象のリソース。現在のバックバッファに対して行う
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	// 遷移前（現在）の	ResourceState
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	// 遷移後のResourceState
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	// TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier_);
 
 	//--------------------------------
 	// 描画先のRTVとDSVを指定する
@@ -309,18 +337,12 @@ void DirectXCommon::PostDraw()
 	// リソースバリアで表示状態に変更
 	//--------------------------------
 
-	D3D12_RESOURCE_BARRIER barrier{};
-
-	// PreDrawと同じものを設定
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	// 画面に描く処理はすべて終わり、画面に映すので状態を遷移
 	// 今回はRenderTargetからPresentにする
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	// TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier_);
 
 	//--------------------------------
 	// グラフィックスコマンドをクローズ
@@ -333,7 +355,7 @@ void DirectXCommon::PostDraw()
 	// GPUコマンドの実行
 	//--------------------------------
 
-	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_ };
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_};
 	// この関数を呼ぶまではGPUへの命令をたくさん貯めただけであって、GPUはまだ何もしない
 	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 
