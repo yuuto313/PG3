@@ -36,6 +36,7 @@
 #include "D3DResourceLeakChecker.h"
 #include "MyMath.h"
 
+
 //平行光源
 typedef struct {
 	Vector4 color;//ライトの色
