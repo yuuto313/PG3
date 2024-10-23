@@ -283,10 +283,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	pAudio = new Audio();
 	pAudio->InitXAudio2();
-	// 音声データ読み込み
-	SoundData soundData1 = pAudio->SoundLoadWave("Resources/sound/Alarm01.wav");
-	// 再生
-	pAudio->SoundPlayWave(soundData1);
 
 	//-------------------------------------
 	// ImGuiの初期化
@@ -641,7 +637,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	pAudio->ResetXAudio2();
-	pAudio->SoundUnload(&soundData1);
 
 	//-------------------------------------
 	// WindowsAPIの終了処理
