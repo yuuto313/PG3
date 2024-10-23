@@ -14,15 +14,6 @@ using namespace Microsoft::WRL;
 
 DirectXCommon::DirectXCommon()
 {
-	swapChainDesc_ = {};
-	rtvDesc_ = {};
-	includeHandler_ = {};
-	fenceEvent_ = {};
-	dxcUtils_ = {};
-	dxcCompiler_ = {};
-	descriptorSizeSRV_ = {};
-	descriptorSizeRTV_ = {};
-	descriptorSizeDSV_ = {};
 }
 
 DirectXCommon::~DirectXCommon()
