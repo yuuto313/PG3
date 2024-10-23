@@ -147,9 +147,9 @@ void Sprite::CreateVertexData()
 	//-------------------------------------
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+
 	//１枚目の三角形
 	//左下
-
 	vertexData_[0].position = { 0.0f,360.f,0.0f,1.0f };
 	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };

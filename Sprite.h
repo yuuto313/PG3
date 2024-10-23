@@ -55,6 +55,7 @@ private:
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
+
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 	TransformationMatrix* wvpData_ = nullptr;
 

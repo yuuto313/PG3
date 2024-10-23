@@ -9,7 +9,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "WinApp.h"
 
 /// <summary>
-/// ImGuiを管理するクラス(仮実装。用改造)
+/// ImGuiを管理するクラス(仮実装。9章で変更予定)
 /// </summary>
 class ImGuiManager
 {

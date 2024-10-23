@@ -239,18 +239,25 @@ void DirectXCommon::Initialize(WinApp* winApp)
 
 	// 深度バッファの生成
 	CreateDepthBuffer();
+
 	// 各種デスクリプタヒープの生成
 	InitializeDescriptorHeap();
+
 	// レンダーターゲットビューの初期化
 	InitializeRenderTargetView();
+
 	// 深度ステンシルビューの初期化
 	InitializeDepthStencilView();
+
 	// フェンスの生成
 	CreateFence();
+
 	// ビューポート矩形の初期化
 	InitializeViewPort();
+
 	// シザリング矩形の初期化
 	InitializeScissorRect();
+
 	// DCXコンパイラの生成
 	InitializeDXCCompiler();
 }
@@ -727,8 +734,8 @@ void DirectXCommon::InitializeViewPort()
 	//-------------------------------------
 
 	// クライアント領域のサイズと一緒にして画面全体に表示
-	viewport_.Width = WinApp::kClientWidth;
-	viewport_.Height = WinApp::kClientHeight;
+	viewport_.Width = static_cast<float>(WinApp::kClientWidth);
+	viewport_.Height = static_cast<float>(WinApp::kClientHeight);
 	viewport_.TopLeftX = 0;
 	viewport_.TopLeftY = 0;
 	viewport_.MinDepth = 0.0f;
