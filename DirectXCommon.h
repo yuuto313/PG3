@@ -141,17 +141,17 @@ private:
 	WinApp* winApp_ = nullptr;
 
 	//Direct3D関連
-	Microsoft::WRL::ComPtr<ID3D12Device> device_;
-	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_;
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_;
+	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_;
-	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_;
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];

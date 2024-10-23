@@ -29,6 +29,8 @@
 #include "ImGuiManager.h"
 #include "SpriteCommon.h"
 #include "Sprite.h"
+#include "Audio.h"
+
 #include "Logger.h"
 #include "StringUtility.h"
 #include "D3DResourceLeakChecker.h"
@@ -237,13 +239,14 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//ポインタ
-	D3DResourceLeakChecker* leakChecke = nullptr;
-	Input* input = nullptr;
-	WinApp* winApp = nullptr;
-	DirectXCommon* dxCommon = nullptr;
-	ImGuiManager* imguiManager = nullptr;
-	SpriteCommon* spriteCommon = nullptr;	
-	Sprite* sprite = nullptr;
+	D3DResourceLeakChecker* pLeakChecke = nullptr;
+	WinApp* pWinApp = nullptr;
+	Input* pInput = nullptr;
+	DirectXCommon* pDxCommon = nullptr;
+	Audio* pAudio = nullptr;
+	ImGuiManager* pImguiManager = nullptr;
+	SpriteCommon* pSpriteCommon = nullptr;	
+	Sprite* pSprite = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -251,49 +254,60 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// リークチェッカー
 	//-------------------------------------
 
-	leakChecke->~D3DResourceLeakChecker();
+	pLeakChecke->~D3DResourceLeakChecker();
 
 	//-------------------------------------
 	// WinAppAPIの初期化
 	//-------------------------------------
 
-	winApp = new WinApp();
-	winApp->Initialize();
+	pWinApp = new WinApp();
+	pWinApp->Initialize();
 
 	//-------------------------------------
 	// 入力の初期化
 	//-------------------------------------
 
-	input = new Input();
-	input->Initialize(winApp);
+	pInput = new Input();
+	pInput->Initialize(pWinApp);
 
 	//-------------------------------------
 	// DirectXの初期化
 	//-------------------------------------
 
-	dxCommon = new DirectXCommon();
-	dxCommon->Initialize(winApp);
+	pDxCommon = new DirectXCommon();
+	pDxCommon->Initialize(pWinApp);
+
+	//-------------------------------------
+	// Audioの初期化
+	//-------------------------------------
+
+	pAudio = new Audio();
+	pAudio->InitXAudio2();
+	// 音声データ読み込み
+	SoundData soundData1 = pAudio->SoundLoadWave("Resources/sound/Alarm01.wav");
+	// 再生
+	pAudio->SoundPlayWave(soundData1);
 
 	//-------------------------------------
 	// ImGuiの初期化
 	//-------------------------------------
 
-	imguiManager = new ImGuiManager();
-	imguiManager->Initialize(dxCommon, winApp);
+	pImguiManager = new ImGuiManager();
+	pImguiManager->Initialize(pDxCommon, pWinApp);
 
 	//-------------------------------------
 	// スプライト共通部の初期化
 	//-------------------------------------
 
-	spriteCommon = new SpriteCommon();
-	spriteCommon->Initialize(dxCommon);
+	pSpriteCommon = new SpriteCommon();
+	pSpriteCommon->Initialize(pDxCommon);
 
 	//-------------------------------------
 	// スプライトの初期化
 	//-------------------------------------
 
-	sprite = new Sprite();
-	sprite->Initialize(spriteCommon,dxCommon);
+	pSprite = new Sprite();
+	pSprite->Initialize(pSpriteCommon, pDxCommon);
 
 #pragma endregion 基盤システムの初期化
 
@@ -304,7 +318,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
-	if (SUCCEEDED(dxCommon->GetDevice()->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+	if (SUCCEEDED(pDxCommon->GetDevice()->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
 		//やばいエラー時に止まる
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 		//エラー時に止まる
@@ -382,7 +396,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	
 	//Sprite用のTransformationMatrix用のリソースを作る
 	//Matrix4x4１つ分のサイズを用意する
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = dxCommon->CreateBufferResource(sizeof(TransformationMatrix));
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = pDxCommon->CreateBufferResource(sizeof(TransformationMatrix));
 
 	//データを書き込む
 	TransformationMatrix* transformationMatrixDataSprite = nullptr;
@@ -410,20 +424,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //Textureを読んで転送する
     //-------------------------------------
 
-	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resource/uvChecker.png");
+	DirectX::ScratchImage mipImages = pDxCommon->LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
-	dxCommon->UploadTextureData(textureResource, mipImages);
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = pDxCommon->CreateTextureResource(metadata);
+	pDxCommon->UploadTextureData(textureResource, mipImages);
 
 	//-------------------------------------
 	//二枚目のTextureを読んで転送する
 	//-------------------------------------
 
 	//DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
-	DirectX::ScratchImage mipImages2 = dxCommon->LoadTexture("resource/uvChecker.png");
+	DirectX::ScratchImage mipImages2 = pDxCommon->LoadTexture("resource/uvChecker.png");
 	const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = dxCommon->CreateTextureResource(metadata2);
-	dxCommon->UploadTextureData(textureResource2, mipImages2);
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = pDxCommon->CreateTextureResource(metadata2);
+	pDxCommon->UploadTextureData(textureResource2, mipImages2);
 
 	//-------------------------------------
     //ShaderResourceViewを作る
@@ -436,15 +450,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
 
 	//SRVを作成するDescriptorHeapの場所を決める
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxCommon->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = pDxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = pDxCommon->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
 
 	//先頭はImGuiが使っているのでその次を使う
-	textureSrvHandleCPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleGPU.ptr += dxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleCPU.ptr += pDxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU.ptr += pDxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//SRVの生成
-	dxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+	pDxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
 
 	//-------------------------------------
 	//二枚目のShaderResourceViewを作る
@@ -458,11 +472,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//SRVを作成するDescriptorHeapの場所を決める
 	//index = 2の位置にDescriptorを作成する
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 2);
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(pDxCommon->GetSrvDescriptorHeap(), pDxCommon->GetDescriptorSizeSRV(), 2);
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(pDxCommon->GetSrvDescriptorHeap(), pDxCommon->GetDescriptorSizeSRV(), 2);
 
 	//SRVの生成
-	dxCommon->GetDevice()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+	pDxCommon->GetDevice()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
 
 	
 	//テクスチャ切り替え用のbool変数
@@ -470,7 +484,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	while (true) {
 		//Windowのメッセージ処理
-		if (winApp->ProcessMessage()) {
+		if (pWinApp->ProcessMessage()) {
 			//ゲームループを抜ける
 			break;
 		}
@@ -478,19 +492,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//フレームの始まる旨を告げる
 		//-------------------------------------
 
-		imguiManager->Begin();
+		pImguiManager->Begin();
 
 		//-------------------------------------
 		// 入力処理の更新
 		//-------------------------------------
 
-		input->Update();
+		pInput->Update();
 		
 		//-------------------------------------
 		// スプライトの更新
 		//-------------------------------------
 
-		sprite->Update();
+		pSprite->Update();
 
 		//-------------------------------------
 		//UVTransform用の行列を作成する
@@ -506,7 +520,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 		
-		imguiManager->UpdateGameUI();
+		pImguiManager->UpdateGameUI();
 
 		/*ImGui::DragFloat3("CameraTranslate", &cameraTransform.translate.x, 0.05f);
 		ImGui::SliderAngle("CameraRotateX", &cameraTransform.rotate.x);
@@ -537,18 +551,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 
 		// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
-		dxCommon->PreDraw();		
+		pDxCommon->PreDraw();
 
 		// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
-		spriteCommon->Draw();
+		pSpriteCommon->Draw();
 
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
 		//-------------------------------------
 
-		imguiManager->End();
+		pImguiManager->End();
 
-		sprite->Draw(textureSrvHandleGPU);
+		pSprite->Draw(textureSrvHandleGPU);
 
 		//-------------------------------------
 		//コマンドを積んで描画
@@ -600,44 +614,52 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 画面表示できるようにする
 		//-------------------------------------
 
-		imguiManager->Draw();
+		pImguiManager->Draw();
 		
 		//-------------------------------------
 		// 描画後処理
 		//-------------------------------------
 
-		dxCommon->PostDraw();
+		pDxCommon->PostDraw();
 		
 	}
 
 	//-------------------------------------
-    //COMの終了処理
+    // COMの終了処理
     //-------------------------------------
 
 	CoUninitialize();
 
     //-------------------------------------
-	//ImGuiの終了処理
+	// ImGuiの終了処理
 	//-------------------------------------
 	
-	imguiManager->Finalize();
+	pImguiManager->Finalize();
 
 	//-------------------------------------
-	//WindowsAPIの終了処理
+	// Audioクラスの後始末
+	//-------------------------------------
+
+	pAudio->ResetXAudio2();
+	pAudio->SoundUnload(&soundData1);
+
+	//-------------------------------------
+	// WindowsAPIの終了処理
 	//-------------------------------------
 	
-	winApp->Finalize();
+	pWinApp->Finalize();
 
 	//-------------------------------------
-    //解放処理
+    // 解放処理
     //-------------------------------------
 
-	delete sprite;
-	delete spriteCommon;
-	delete imguiManager;
-	delete dxCommon;
-	delete input;
-	delete winApp;
+	delete pSprite;
+	delete pSpriteCommon;
+	delete pImguiManager;
+	delete pAudio;
+	delete pDxCommon;
+	delete pInput;
+	delete pWinApp;
 
 	return 0;
 }
