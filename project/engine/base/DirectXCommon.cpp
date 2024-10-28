@@ -162,34 +162,6 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 	return resource;
 }
 
-//[[nodiscard]]
-//Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages)
-//{
-//	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-//
-//	 PrepareUploadを利用して、読み込んだデータからDirectX12用のSubresourceの配列を作成する
-//	DirectX::PrepareUpload(device_.Get(), mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
-//	 Subresourceの数を基に、コピー元となるintermediateResourceに必要なサイズを計算する
-//	uint64_t intermediateSize = GetRequiredIntermediateSize(texture.Get(), 0, UINT(subresources.size()));
-//	 計算したサイズでIntermediateResourceを作る
-//	 intermediateResource<中間リソース>
-//	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource = CreateBufferResource(intermediateSize);
-//
-//	 データ転送をコマンドに積む
-//	UpdateSubresources(commandList_.Get(), texture.Get(), intermediateResource.Get(), 0, 0, UINT(subresources.size()), subresources.data());
-//
-//	 Texutureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
-//	
-//	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-//	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-//	barrier_.Transition.pResource = texture.Get();
-//	barrier_.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-//	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-//	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_GENERIC_READ;
-//	commandList_->ResourceBarrier(1, &barrier_);
-//	return intermediateResource.Get();
-//}
-
 void DirectXCommon::UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages)
 {
 	// Meta情報を取得
