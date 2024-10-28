@@ -378,46 +378,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//directionalLightData->intensity = 1.0f;
 
 	//-------------------------------------
-	//uvTransform用の変数を用意
-	//-------------------------------------
-
-	Transform uvTransformSprite{
-		{1.0f,1.0f,1.f},
-		{0.0f,0.0f,0.0f},
-		{0.0f,0.0f,0.0f},
-	};
-
-	//-------------------------------------
-	//VertexShaderで利用するtransformationMatrix用のResourceを作成
-	//-------------------------------------
-	
-	//Sprite用のTransformationMatrix用のリソースを作る
-	//Matrix4x4１つ分のサイズを用意する
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResourceSprite = pDxCommon->CreateBufferResource(sizeof(TransformationMatrix));
-
-	//データを書き込む
-	TransformationMatrix* transformationMatrixDataSprite = nullptr;
-	//書き込むためのアドレスを取得する
-	transformationMatrixResourceSprite->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixDataSprite));
-	//単位行列を書き込んでおく
-	transformationMatrixDataSprite->WVP = MyMath::MakeIdentity4x4();
-	transformationMatrixDataSprite->World = MyMath::MakeIdentity4x4();
-	//CPUで動かす用のTransformを作る
-	Transform transformSprite{ { 1.0f,1.0f,1.0f }, { 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f } };
-
-	//-------------------------------------
-    //WVPMatrixを作って書き込む
-	//-------------------------------------
-
-	//Sprite用のWorldViewProjectionMatrixを作る
-	Matrix4x4 worldMatrixSprite = MyMath::MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
-	Matrix4x4 viewMatrixSprite = MyMath::MakeIdentity4x4();
-	Matrix4x4 projectionMatrixSprite = MyMath::MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrixSprite = MyMath::Multiply(worldMatrixSprite, MyMath::Multiply(viewMatrixSprite, projectionMatrixSprite));
-	transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
-	transformationMatrixDataSprite->World = worldMatrixSprite;
-
-	//-------------------------------------
     //Textureを読んで転送する
     //-------------------------------------
 
@@ -503,14 +463,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		pSprite->Update();
 
-		//-------------------------------------
-		//UVTransform用の行列を作成する
-		//-------------------------------------
-
-		/*Matrix4x4 uvTransformMatrix = MyMath::MakeScaleMatrix(uvTransformSprite.scale);
-		uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeRotateZMatrix(uvTransformSprite.rotate.z));
-		uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeTranslateMatrix(uvTransformSprite.translate));
-		materialDataSprite->uvTransform = uvTransformMatrix;*/
+	
 
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
@@ -518,23 +471,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 		
 		pImguiManager->UpdateGameUI();
-
-		/*ImGui::DragFloat3("CameraTranslate", &cameraTransform.translate.x, 0.05f);
-		ImGui::SliderAngle("CameraRotateX", &cameraTransform.rotate.x);
-		ImGui::SliderAngle("CameraRotateY", &cameraTransform.rotate.y);
-		ImGui::SliderAngle("CameraRotateZ", &cameraTransform.rotate.z);
-
-		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
-
-		ImGui::DragFloat3("DirectionalLight.direction", &directionalLightData->direction.x, 0.01f);
-
-		ImGui::SliderAngle("SphereRotateX", &transform.rotate.x);
-		ImGui::SliderAngle("SphereRotateY", &transform.rotate.y);
-		ImGui::SliderAngle("SphereRotateZ", &transform.rotate.z);*/
-
-		/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.f);
-		ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.f);
-		ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
 
 
 		//-------------------------------------
@@ -560,52 +496,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		pImguiManager->End();
 
 		pSprite->Draw(textureSrvHandleGPU);
-
-		//-------------------------------------
-		//コマンドを積んで描画
-		//-------------------------------------		
-		//
-		////RootSignatureを設定。PSOに設定してるけど別途設定が必要
-		////dxCommon->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-		////dxCommon->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());//PSOを設定
-		//dxCommon->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);//VBVを設定
-		////形状を設定。PSOに設定してるものとはまた別。同じものを設定すると考えておけばいい
-		////dxCommon->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		////マテリアルCBufferの場所を設定
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-
-		////wvp用のCBufferの場所を設定
-		////RootParameter[1]に対してCBVの設定
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
-
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-
-		////SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
-		////変数を見て利用するSRVを決める。チェックがはいいているとき（=true）のとき、モンスターボールを使い、falseのときはuvCheckerを使う
-		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
-
-		////描画！（DrawCall/ドローコール）。３頂点で１つのインスタンス。
-		////commandList->DrawInstanced(static_cast<size_t>(kSubdivision * kSubdivision) * 6, 1, 0, 0);
-		//dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
-
-		////-------------------------------------
-		////矩形の描画コマンドを積む
-		////-------------------------------------
-
-		////マテリアルCBufferの場所を設定
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
-		////TransformationMatrixCBufferの場所を設定する
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-
-		////SpriteはuvCheckerを使うようにする
-		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-
-		//dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
-
-		////描画！（DrawCall/ドローコール)
-		//dxCommon->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
 
 		//-------------------------------------
 		// 画面表示できるようにする

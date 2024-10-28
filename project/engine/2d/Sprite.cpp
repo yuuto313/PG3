@@ -23,8 +23,8 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
 
 	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
-	//zが-５の位置でｚ+の方向を向いているカメラ
-	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	uvTransform_ = { {1.0f,1.0f,1.f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
 
 	//-------------------------------------
 	// 頂点データ作成
@@ -59,28 +59,11 @@ void Sprite::Update()
 	ImGui::SliderFloat3("transform", &transform_.translate.x, -10.0f, 10.0f);
 	ImGui::End();
 #endif // _DEBUG
-	//-------------------------------------
-	// TransformからWorldMatrixを作る
-	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	CreateWVPMatrix();
 
-	//-------------------------------------
-	// ViewMatrixを作って単位行列を代入
-	//-------------------------------------
+	CreateUvTransformMatrix();
 
-	Matrix4x4 cameraMatrix = MyMath::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-	Matrix4x4 viewMatrix = MyMath::Inverse(cameraMatrix);
-
-	//-------------------------------------
-	// ProjectionMatrixを作って並行投影行列を書き込む
-	//-------------------------------------
-
-	Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.f);
-
-	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData_->WVP = worldViewProjectionMatrix;
-	transformationMatrixData_->World = worldMatrix;
 }
 
 void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
@@ -252,24 +235,52 @@ void Sprite::CreateTrasnformationMatrixData()
 	// 座標変換行列リソースを作る
 	//-------------------------------------
 
-	//wvpResource_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 	transformationMatrix_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 	
 	//-------------------------------------
 	// 座標変換行列リソースにデータを書き込むためのアドレスを取得してtransformationMatrixDataに割り当てる
 	//-------------------------------------
 
-	//wvpResource_->Map(0, nullptr, reinterpret_cast<void**>(&wvpData_));
 	transformationMatrix_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 
 	//-------------------------------------
 	// 単位行列を書き込んでおく
 	//-------------------------------------
 
-	//単位行列を書き込んでおく
-	//wvpData_->WVP = MyMath::MakeIdentity4x4();
-	//wvpData_->World = MyMath::MakeIdentity4x4();
 	transformationMatrixData_->WVP = MyMath::MakeIdentity4x4();
 	transformationMatrixData_->World = MyMath::MakeIdentity4x4();
 
+}
+
+void Sprite::CreateWVPMatrix()
+{
+	//-------------------------------------
+	// TransformからWorldMatrixを作る
+	//-------------------------------------
+
+	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+
+	//-------------------------------------
+	// ViewMatrixを作って単位行列を代入
+	//-------------------------------------
+
+	Matrix4x4 viewMatrix = MyMath::MakeIdentity4x4();
+
+	//-------------------------------------
+	// ProjectionMatrixを作って並行投影行列を書き込む
+	//-------------------------------------
+
+	Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.f);
+
+	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	transformationMatrixData_->World = worldMatrix;
+}
+
+void Sprite::CreateUvTransformMatrix()
+{
+	Matrix4x4 uvTransformMatrix = MyMath::MakeScaleMatrix(uvTransform_.scale);
+	uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeRotateZMatrix(uvTransform_.rotate.z));
+	uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeTranslateMatrix(uvTransform_.translate));
+	materialData_->uvTransform = uvTransformMatrix;
 }

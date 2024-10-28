@@ -45,7 +45,7 @@ private:
 	DirectXCommon* dxCommon_ = nullptr;
 
 	Transform transform_ = {};
-	Transform cameraTransform_ = {};
+	Transform uvTransform_ = {};
 
 	// バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
@@ -87,5 +87,15 @@ private:
 	/// 座標変換行列データ作成
 	/// </summary>
 	void CreateTrasnformationMatrixData();
+
+	/// <summary>
+	/// WVP行列を作成する
+	/// </summary>
+	void CreateWVPMatrix();
+
+	/// <summary>
+	/// UVTransform用の行列を作成する
+	/// </summary>
+	void CreateUvTransformMatrix();
 };
 
