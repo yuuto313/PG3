@@ -8,9 +8,12 @@
 
 int main(int argc,char* argv[]) {	
 
-	Math<int> b1(10, 20);
-	Math<float> b2(30.0f, 20.0f);
-	Math<double> b3(20.0, 5.0);
+	Math<int,int> b1(10, 20);
+	Math<float,float> b2(30.0f, 20.0f);
+	Math<double,double> b3(20.0, 5.0);
+	Math<int, float> b4(30, 29.0f);
+	Math<int, double> b5(20, 15.0);
+	Math<float, double> b6(3.0f, 5.0);
 
 	// int型の比較
 	
@@ -31,17 +34,17 @@ int main(int argc,char* argv[]) {
 
 	// intとfloat型の比較
 	printf("intとfloat型の比較\n");
-	printf("%dと%fの比較結果 : %f\n", b1.a, b2.b, b1.Min(b1.a, b2.b));
+	printf("%dと%fの比較結果 : %f\n", b4.a, b4.b, b4.Min(b4.a, b4.b));
 	printf("\n");
 
 	// intとdouble型の比較
 	printf("intとdouble型の比較\n");
-	printf("%dと%lfの比較結果 : %f\n", b1.a, b3.b, b1.Min(b1.a, b3.b));
+	printf("%dと%lfの比較結果 : %f\n", b5.a, b5.b, b5.Min(b5.a, b5.b));
 	printf("\n");
 
 	// floatとdouble型の比較
 	printf("floatとdouble型の比較\n");
-	printf("%fと%lfの比較結果 : %lf\n", b2.a, b3.a, b2.Min(b2.a, b3.a));
+	printf("%fと%lfの比較結果 : %lf\n", b6.a, b6.b, b6.Min(b6.a, b6.a));
 	printf("\n");
 
 	return 0;
