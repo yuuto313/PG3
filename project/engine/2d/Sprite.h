@@ -52,13 +52,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrix_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> wvpResource_;
 
 	// バッファリソース内のデータを指すポインタ
 	VertexData* vertexData_ = nullptr;
 	uint32_t* indexData_ = nullptr;
 	Material* materialData_ = nullptr;
-
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 
 	// バッファリソースの使い道を補足するバッファビュー
