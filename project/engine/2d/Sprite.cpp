@@ -94,8 +94,8 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WR
 	// 座標変換行列CBufferの場所を設定
 	//-------------------------------------
 	
-	//wvp用のCBufferの場所を設定
-	//RootParameter[1]に対してCBVの設定
+	// wvp用のCBufferの場所を設定
+	// RootParameter[1]に対してCBVの設定
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrix_->GetGPUVirtualAddress());	
 	
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
@@ -104,8 +104,8 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WR
 	// SRVのDescriptorTableの先頭を設定
 	//-------------------------------------
 
-	//SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
-	//変数を見て利用するSRVを決める
+	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
+	// 変数を見て利用するSRVを決める
 	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2,textureSrvHandleGPU); 
 
 	//-------------------------------------
@@ -128,11 +128,11 @@ void Sprite::CreateVertexData()
 	// VertexBufferViewを作成する(値を設定するだけ)
 	//-------------------------------------
 
-	//リソースの先頭アドレスから使う
+	// リソースの先頭アドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点６つ分のサイズ
+	// 使用するリソースのサイズは頂点６つ分のサイズ
 	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
-	//１頂点分のサイズ
+	// １頂点分のサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 
 	//-------------------------------------
@@ -141,22 +141,22 @@ void Sprite::CreateVertexData()
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
-	//１枚目の三角形
-	//左下
+	// １枚目の三角形
+	// 左下
 	vertexData_[0].position = { 0.0f,360.f,0.0f,1.0f };
 	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
-	//左上
+	// 左上
 	vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
 
-	//右下
+	// 右下
 	vertexData_[2].position = { 640.f,360.f,0.0f,1.0f };
 	vertexData_[2].texcoord = { 1.0f,1.0f };
 	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
 
-	//右上
+	// 右上
 	vertexData_[3].position = { 640.0f,0.0f,0.0f,1.0f };
 	vertexData_[3].texcoord = { 1.0f,0.0f };
 	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
@@ -175,11 +175,11 @@ void Sprite::CreateIndexData()
 	// IndexBufferViewを作成する(値を設定するだけ)
 	//-------------------------------------
 
-	//リソースの先頭のアドレスから使う
+	// リソースの先頭のアドレスから使う
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	//使用するリソースサイズはインデックス6つ分のサイズ
+	// 使用するリソースサイズはインデックス6つ分のサイズ
 	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	//インデックスはuint32_tとする
+	// インデックスはuint32_tとする
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 	//-------------------------------------
@@ -187,17 +187,17 @@ void Sprite::CreateIndexData()
 	//-------------------------------------
 
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	//左下
+	// 左下
 	indexData_[0] = 0;
-	//左上
+	// 左上
 	indexData_[1] = 1;
-	//右下
+	// 右下
 	indexData_[2] = 2;
-	//左上
+	// 左上
 	indexData_[3] = 1;
-	//右上
+	// 右上
 	indexData_[4] = 3;
-	//右下
+	// 右下
 	indexData_[5] = 2;
 
 }
@@ -214,18 +214,18 @@ void Sprite::CreateMaterialData()
 	// マテリアルリソースにデータを書き込むためのアドレスを取得してmaterialDataに割り当てる
 	//-------------------------------------
 
-	//書き込むためのアドレスを取得
+	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 
 	//-------------------------------------
 	// マテリアルデータの初期値を書き込む
 	//-------------------------------------
 
-	//今回は白を書き込み
+	// 今回は白を書き込み
 	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	//SpriteはLightingしないのでfalseを設定する
+	// SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = false;
-	//単位行列で初期化
+	// 単位行列で初期化
 	materialData_->uvTransform = MyMath::MakeIdentity4x4();
 
 }
