@@ -9,14 +9,13 @@
 int main(int argc,char* argv[]) {	
 
 	Math<int,int> b1(10, 20);
-	Math<float,float> b2(30.0f, 20.0f);
-	Math<double,double> b3(20.0, 5.0);
+	Math<float,float> b2(30.0f, 20.5f);
+	Math<double,double> b3(20.295, 20.352);
 	Math<int, float> b4(30, 29.0f);
-	Math<int, double> b5(20, 15.0);
-	Math<float, double> b6(3.0f, 5.0);
+	Math<int, double> b5(20, 15.219);
+	Math<float, double> b6(3.0f, 5.658);
 
 	// int型の比較
-	
 	printf("小さい方の値を表示します\n");
 	printf("int型の比較\n");
 	printf("%dと%dの比較結果 : %d\n",b1.a,b1.b, b1.Min(b1.a, b1.b));
