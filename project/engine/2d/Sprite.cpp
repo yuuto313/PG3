@@ -60,9 +60,52 @@ void Sprite::Update()
 	ImGui::End();
 #endif // _DEBUG
 
-	CreateWVPMatrix();
+	//-------------------------------------
+	// 頂点リソースにデータを書き込む
+	//-------------------------------------
 
-	CreateUvTransformMatrix();
+	// １枚目の三角形
+	// 左下
+	vertexData_[0].position = { 0.0f,360.f,0.0f,1.0f };
+	vertexData_[0].texcoord = { 0.0f,1.0f };
+	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
+	// 左上
+	vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexData_[1].texcoord = { 0.0f,0.0f };
+	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
+
+	// 右下
+	vertexData_[2].position = { 640.f,360.f,0.0f,1.0f };
+	vertexData_[2].texcoord = { 1.0f,1.0f };
+	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
+
+	// 右上
+	vertexData_[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexData_[3].texcoord = { 1.0f,0.0f };
+	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
+
+	//-------------------------------------
+	// インデックスリソースにデータを書き込む
+	//-------------------------------------
+
+	// 左下
+	indexData_[0] = 0;
+	// 左上
+	indexData_[1] = 1;
+	// 右下
+	indexData_[2] = 2;
+	// 左上
+	indexData_[3] = 1;
+	// 右上
+	indexData_[4] = 3;
+	// 右下
+	indexData_[5] = 2;
+
+	//-------------------------------------
+	// Transform情報を作る
+	//-------------------------------------
+
+	CreateWVPMatrix();
 
 }
 
@@ -141,26 +184,6 @@ void Sprite::CreateVertexData()
 
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 
-	// １枚目の三角形
-	// 左下
-	vertexData_[0].position = { 0.0f,360.f,0.0f,1.0f };
-	vertexData_[0].texcoord = { 0.0f,1.0f };
-	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
-	// 左上
-	vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };
-	vertexData_[1].texcoord = { 0.0f,0.0f };
-	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
-
-	// 右下
-	vertexData_[2].position = { 640.f,360.f,0.0f,1.0f };
-	vertexData_[2].texcoord = { 1.0f,1.0f };
-	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
-
-	// 右上
-	vertexData_[3].position = { 640.0f,0.0f,0.0f,1.0f };
-	vertexData_[3].texcoord = { 1.0f,0.0f };
-	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
-
 }
 
 void Sprite::CreateIndexData()
@@ -183,22 +206,10 @@ void Sprite::CreateIndexData()
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 	//-------------------------------------
-	// VertexResourceを作る
+	// IndexResourceにデータを書き込むためのアドレスを取得してIndexDataに割り当てる
 	//-------------------------------------
 
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData_));
-	// 左下
-	indexData_[0] = 0;
-	// 左上
-	indexData_[1] = 1;
-	// 右下
-	indexData_[2] = 2;
-	// 左上
-	indexData_[3] = 1;
-	// 右上
-	indexData_[4] = 3;
-	// 右下
-	indexData_[5] = 2;
 
 }
 
@@ -271,17 +282,9 @@ void Sprite::CreateWVPMatrix()
 	// ProjectionMatrixを作って並行投影行列を書き込む
 	//-------------------------------------
 
-	Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.f);
+	Matrix4x4 projectionMatrix = MyMath::MakeOrthographicMatrix(0.0f,0.0f, float(WinApp::kClientWidth) ,float(WinApp::kClientHeight), 0.0f, 100.f);
 
-	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	Matrix4x4 wvpMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+	transformationMatrixData_->WVP = wvpMatrix;
 	transformationMatrixData_->World = worldMatrix;
-}
-
-void Sprite::CreateUvTransformMatrix()
-{
-	Matrix4x4 uvTransformMatrix = MyMath::MakeScaleMatrix(uvTransform_.scale);
-	uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeRotateZMatrix(uvTransform_.rotate.z));
-	uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeTranslateMatrix(uvTransform_.translate));
-	materialData_->uvTransform = uvTransformMatrix;
 }

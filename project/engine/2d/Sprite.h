@@ -90,9 +90,5 @@ private:
 	/// </summary>
 	void CreateWVPMatrix();
 
-	/// <summary>
-	/// UVTransform用の行列を作成する
-	/// </summary>
-	void CreateUvTransformMatrix();
 };
 
