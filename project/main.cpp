@@ -369,13 +369,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//平行光源用のResourceを作成
 	//-------------------------------------
 
-	//Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = dxCommon->CreateBufferResource(sizeof(DirectionalLight));
-	//DirectionalLight* directionalLightData = nullptr;
-	//directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-	////デフォルトの値は以下にしておく
-	//directionalLightData->color = { 1.0f,1.0f,1.0f };
-	//directionalLightData->direction = MyMath::Normalize({ 0.0f,-1.0f,0.0f });
-	//directionalLightData->intensity = 1.0f;
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = pDxCommon->CreateBufferResource(sizeof(DirectionalLight));
+	DirectionalLight* directionalLightData = nullptr;
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	//デフォルトの値は以下にしておく
+	directionalLightData->color = { 1.0f,1.0f,1.0f };
+	directionalLightData->direction = MyMath::Normalize({ 0.0f,-1.0f,0.0f });
+	directionalLightData->intensity = 1.0f;
 
 	//-------------------------------------
     //Textureを読んで転送する
@@ -477,7 +477,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ライトの向きを正規化
 		//-------------------------------------
 
-		//directionalLightData->direction = MyMath::Normalize(directionalLightData->direction);
+		directionalLightData->direction = MyMath::Normalize(directionalLightData->direction);
 		
 		//-------------------------------------
 		// 描画前処理
@@ -487,15 +487,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		pDxCommon->PreDraw();
 
 		// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
-		pSpriteCommon->Draw();
+		pSpriteCommon->SetCommonDrawing();
+		
+		//-------------------------------------
+		// Sprite個々の描画
+		//-------------------------------------
+
+		pSprite->Draw(textureSrvHandleGPU,directionalLightResource);
 
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
 		//-------------------------------------
 
 		pImguiManager->End();
-
-		pSprite->Draw(textureSrvHandleGPU);
 
 		//-------------------------------------
 		// 画面表示できるようにする

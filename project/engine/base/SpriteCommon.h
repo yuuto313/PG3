@@ -19,7 +19,7 @@ public:
 	/// <summary>
 	/// 共通描画設定
 	/// </summary>
-	void Draw();
+	void SetCommonDrawing();
 
 	//-------------ゲッター・セッター-------------//
 

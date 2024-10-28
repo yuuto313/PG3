@@ -14,7 +14,7 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 
 }
 
-void SpriteCommon::Draw()
+void SpriteCommon::SetCommonDrawing()
 {
 	//RootSignatureを設定。PSOに設定してるけど別途設定が必要
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());

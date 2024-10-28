@@ -33,7 +33,7 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU);
+	void Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource);
 
 	//-------------ゲッター・セッター-------------//
 
@@ -60,7 +60,6 @@ private:
 	Material* materialData_ = nullptr;
 
 	TransformationMatrix* transformationMatrixData_ = nullptr;
-	TransformationMatrix* wvpData_ = nullptr;
 
 	// バッファリソースの使い道を補足するバッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_ = {};

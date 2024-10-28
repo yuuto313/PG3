@@ -66,7 +66,7 @@ void Sprite::Update()
 
 }
 
-void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
+void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource)
 {
 	//-------------------------------------
 	// VettexBufferViewを設定
@@ -96,21 +96,22 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU)
 	
 	//wvp用のCBufferの場所を設定
 	//RootParameter[1]に対してCBVの設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrix_->GetGPUVirtualAddress());
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrix_->GetGPUVirtualAddress());	
+	
+	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 	//-------------------------------------
 	// SRVのDescriptorTableの先頭を設定
 	//-------------------------------------
 
 	//SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
-	//変数を見て利用するSRVを決める。チェックがはいいているとき（=true）のとき、モンスターボールを使い、falseのときはuvCheckerを使う
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2,textureSrvHandleGPU);
+	//変数を見て利用するSRVを決める
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2,textureSrvHandleGPU); 
 
 	//-------------------------------------
 	// 描画!(DrawCall/ドローコール)
 	//-------------------------------------
 
-	//描画！（DrawCall/ドローコール)
 	dxCommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 }
