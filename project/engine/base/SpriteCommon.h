@@ -23,7 +23,7 @@ public:
 
 	//-------------ゲッター・セッター-------------//
 
-	DirectXCommon* GetDxCommon()const { dxCommon_; }
+	DirectXCommon* GetDxCommon()const {return dxCommon_; }
 
 private:
 
