@@ -7,7 +7,6 @@ struct Material
     float4x4 uvTransform;
 };
 
-
 struct DirectionalLight
 {
     float4 color; //ライトの色
