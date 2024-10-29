@@ -247,7 +247,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* pAudio = nullptr;
 	ImGuiManager* pImguiManager = nullptr;
 	SpriteCommon* pSpriteCommon = nullptr;	
-	Sprite* pSprite = nullptr;
+	std::vector<Sprite*> pSprites;
 
 #pragma region 基盤システムの初期化
 
@@ -303,8 +303,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライトの初期化
 	//-------------------------------------
 
-	pSprite = new Sprite();
-	pSprite->Initialize(pSpriteCommon, pDxCommon);
+	for (uint32_t i = 0; i < 5; ++i) {
+		Sprite* pSprite = new Sprite();
+		pSprite->Initialize(pSpriteCommon, pDxCommon);
+		pSprites.push_back(pSprite);
+	}
 
 #pragma endregion 基盤システムの初期化
 
@@ -460,11 +463,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 		// スプライトの更新
 		//-------------------------------------
-
-		pSprite->Update();
-
-	
-
+		
+		for (uint32_t i = 0; i < pSprites.size(); ++i) {
+			pSprites[i]->Update();
+			// スプライトごとに異なる座標を設定
+			pSprites[i]->SetPosition(Vector2(100.0f * i, 50.0f * i));
+		}
+		
+		
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
 		//-------------------------------------
@@ -493,7 +499,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// Sprite個々の描画
 		//-------------------------------------
 
-		pSprite->Draw(textureSrvHandleGPU,directionalLightResource);
+		for (uint32_t i = 0; i < pSprites.size();++i) {
+			pSprites[i]->Draw(textureSrvHandleGPU, directionalLightResource);
+		}
+
 
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
@@ -543,7 +552,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
-	delete pSprite;
+	for (Sprite* pSprite : pSprites) {
+		delete pSprite;
+	}
 	delete pSpriteCommon;
 	delete pImguiManager;
 	delete pAudio;

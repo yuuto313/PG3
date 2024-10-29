@@ -21,7 +21,9 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
 	// Transform情報を作る
 	//-------------------------------------
 
-	transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transform_.scale = { size_.x,size_.y,1.0f };
+	transform_.rotate = { 0.0f,0.0f,rotation_ };
+	transform_.translate = { position_.x,position_.y,0.0f };
 
 	uvTransform_ = { {1.0f,1.0f,1.f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
@@ -54,19 +56,13 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
 
 void Sprite::Update()
 {
-#ifdef _DEBUG
-	ImGui::Begin("Sprite");
-	ImGui::SliderFloat3("transform", &transform_.translate.x, -10.0f, 10.0f);
-	ImGui::End();
-#endif // _DEBUG
-
 	//-------------------------------------
 	// 頂点リソースにデータを書き込む
 	//-------------------------------------
 
 	// １枚目の三角形
 	// 左下
-	vertexData_[0].position = { 0.0f,360.f,0.0f,1.0f };
+	vertexData_[0].position = { 0.0f,1.0f,0.0f,1.0f };
 	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
 	// 左上
@@ -75,12 +71,12 @@ void Sprite::Update()
 	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
 
 	// 右下
-	vertexData_[2].position = { 640.f,360.f,0.0f,1.0f };
+	vertexData_[2].position = { 1.0f,1.0f,0.0f,1.0f };
 	vertexData_[2].texcoord = { 1.0f,1.0f };
 	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
 
 	// 右上
-	vertexData_[3].position = { 640.0f,0.0f,0.0f,1.0f };
+	vertexData_[3].position = { 1.0f,0.0f,0.0f,1.0f };
 	vertexData_[3].texcoord = { 1.0f,0.0f };
 	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
 
@@ -106,6 +102,12 @@ void Sprite::Update()
 	//-------------------------------------
 
 	CreateWVPMatrix();
+
+#ifdef _DEBUG
+	ImGui::Begin("Sprite");
+	ImGui::SliderFloat3("transform", &transform_.translate.x, -10.0f, 10.0f);
+	ImGui::End();
+#endif // _DEBUG
 
 }
 
@@ -266,6 +268,10 @@ void Sprite::CreateTrasnformationMatrixData()
 
 void Sprite::CreateWVPMatrix()
 {
+	transform_.scale = { size_.x,size_.y,1.0f };
+	transform_.rotate = { 0.0f,0.0f,rotation_ };
+	transform_.translate = { position_.x,position_.y,0.0f };
+
 	//-------------------------------------
 	// TransformからWorldMatrixを作る
 	//-------------------------------------

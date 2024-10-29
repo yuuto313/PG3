@@ -37,9 +37,31 @@ public:
 
 	//-------------ゲッター・セッター-------------//
 
+	const Vector2& GetPosition()const { return position_; }
+	
+	float GetRotation()const { return rotation_; }
+
+	const Vector2& GetSize()const { return size_; }
+
+	const Vector4& GetColor()const { return materialData_->color; }
+
+	void SetPosition(const Vector2& position) { this->position_ = position; }
+	
+	void SetRotation(float rotation) { this->rotation_ = rotation; }
+	
+	void SetSize(const Vector2& size) { this->size_ = size; }
+
+	void SetColor(const Vector4& color) { materialData_->color = color; }
 
 private:
 	//-------------メンバ変数-------------//
+
+	// 座標
+	Vector2 position_ = { 0.0f,0.0f };
+	// 回転
+	float rotation_ = 0.0f;
+	// サイズ
+	Vector2 size_ = { 640.0f,360.0f };
 
 	SpriteCommon* spriteCommon_ = nullptr;
 	DirectXCommon* dxCommon_ = nullptr;
