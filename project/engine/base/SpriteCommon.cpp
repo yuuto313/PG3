@@ -1,5 +1,6 @@
 #include "SpriteCommon.h"
 #include "Logger.h"
+#include "ImGuiManager.h"
 
 void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 {
@@ -14,6 +15,29 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 
 }
 
+void SpriteCommon::ImGui()
+{
+	ImGui::Begin("BlendDesc");
+	const char* items[] = { "None","Normal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen" };
+	static int item_current = static_cast<int>(blendMode_);
+	if (ImGui::Combo("Blend", &item_current, items, IM_ARRAYSIZE(items))) {
+		blendMode_ = static_cast<BlendMode>(item_current);
+	}
+	ImGui::End();
+
+	//-------------------------------------
+	// ブレンドモードが変更された場合、パイプラインステートを再作成
+	//-------------------------------------
+	static BlendMode previousBlendMode = blendMode_;
+	if (previousBlendMode != blendMode_) {
+		SetBlendState(blendDesc_, blendMode_);
+		graphicsPipelineStateDesc_.BlendState = blendDesc_;
+		graphicsPipelineState_ = CreateGraphicsPipelineState(dxCommon_->GetDevice(), graphicsPipelineStateDesc_);
+		previousBlendMode = blendMode_;
+	}
+}
+
+
 void SpriteCommon::SetCommonDrawing()
 {
 	// RootSignatureを設定。PSOに設定してるけど別途設定が必要
@@ -22,6 +46,69 @@ void SpriteCommon::SetCommonDrawing()
 	dxCommon_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 	// 形状を設定。PSOに設定してるものとはまた別。同じものを設定すると考えておけばいい
 	dxCommon_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void SpriteCommon::SetBlendState(D3D12_BLEND_DESC& blendDesc, BlendMode blendMode)
+{
+	//すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//ブレンドを有効にするか無効にするかの指定
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	switch (blendMode)
+	{
+	case BlendMode::kBlendModeNone:
+		blendDesc.RenderTarget[0].BlendEnable = FALSE;
+		break;
+
+	case BlendMode::kBlendModeNormal:
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+		break;
+
+	case BlendMode::kBlendModeAdd:
+		//加算合成 
+		//Result=SrcColor*SrcAlpha+DestColor
+		//ピクセルシェーダーを出力するRGB値に対して実行する操作を指定する
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		//SrcBlend操作とDestBlend操作を組み合わせる方法を定義する
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+
+	case BlendMode::kBlendModeSubtract:
+		//減算合成
+		//Result=DescColor-SrcColor*SrcAlpha
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+
+	case BlendMode::kBlendModeMultily:
+		//乗算合成
+		//Result=SrcColor*DestColor
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+		break;
+
+	case BlendMode::kBlendModeScreen:
+		//スクリーン合成
+		//Result=(1-DestColor)*SrcColor+DestColor
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+
+	default:
+		break;
+	}
+
+	//α値ブレンド設定。基本的に使わないのでこのまま
+
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 }
 
 void SpriteCommon::CreateRootSignature()
@@ -128,9 +215,8 @@ void SpriteCommon::CreateRootSignature()
 	//-------------------------------------
 	// PixelShaderからの出力を画面にどのように書き込むかを設定する項目
 
-	// BlendStateの設定
-	// すべての色要素を書き込む
-	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	// BlendStateの設定(NormalBlend)
+	SetBlendState(blendDesc_, blendMode_);
 
 	//-------------------------------------
 	// RasterizerStateを作成
@@ -202,4 +288,12 @@ void SpriteCommon::CreateGraphicsPipeline()
 	HRESULT hr = dxCommon_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc_, IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 
+}
+
+Microsoft::WRL::ComPtr<ID3D12PipelineState> SpriteCommon::CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device> device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc)
+{
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+	HRESULT hr = device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+	assert(SUCCEEDED(hr));
+	return pipelineState;
 }

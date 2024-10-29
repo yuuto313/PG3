@@ -248,7 +248,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* pAudio = nullptr;
 	ImGuiManager* pImguiManager = nullptr;
 	SpriteCommon* pSpriteCommon = nullptr;	
-	std::vector<Sprite*> pSprites;
+	Sprite* pSprite = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -304,6 +304,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライトの初期化
 	//-------------------------------------
 
+	pSprite = new Sprite();
+	pSprite->Initialize(pSpriteCommon, pDxCommon);
+	
+
 	std::string filePath = "resource/uvChecker.png";
 
 	for (uint32_t i = 0; i < 5; ++i) {
@@ -311,6 +315,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		pSprite->Initialize(pSpriteCommon, pDxCommon,filePath);
 		pSprites.push_back(pSprite);
 	}
+
 
 	//-------------------------------------
 	// テクスチャマネージャの初期化
@@ -473,12 +478,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// スプライトの更新
 		//-------------------------------------
 		
-		for (uint32_t i = 0; i < pSprites.size(); ++i) {
-			pSprites[i]->Update();
-			// スプライトごとに異なる座標を設定
-			pSprites[i]->SetPosition(Vector2(100.0f * i, 50.0f * i));
-		}
-		
+	
+		pSprite->Update();		
 		
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
@@ -486,7 +487,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 		
 		pImguiManager->UpdateGameUI();
+		pSpriteCommon->ImGui();
 
+		pSprite->ImGui();
+	
 
 		//-------------------------------------
 		//ライトの向きを正規化
@@ -503,10 +507,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
 		pSpriteCommon->SetCommonDrawing();
-		
+
 		//-------------------------------------
 		// Sprite個々の描画
 		//-------------------------------------
+		
+		pSprite->Draw(textureSrvHandleGPU, directionalLightResource);
 
 		for (uint32_t i = 0; i < pSprites.size();++i) {
 			pSprites[i]->Draw(directionalLightResource);
@@ -567,9 +573,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
-	for (Sprite* pSprite : pSprites) {
-		delete pSprite;
-	}
+	
+	delete pSprite;
 	delete pSpriteCommon;
 	delete pImguiManager;
 	delete pAudio;

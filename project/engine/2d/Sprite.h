@@ -31,6 +31,11 @@ public:
 	void Update();
 
 	/// <summary>
+	/// ImGuiで変更する処理
+	/// </summary>
+	void ImGui();
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource);

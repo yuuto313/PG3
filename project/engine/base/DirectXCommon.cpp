@@ -377,6 +377,7 @@ void DirectXCommon::PostDraw()
 	//--------------------------------
 	// コマンドリストのリセット
 	//--------------------------------
+	//--------------------------------
 
 	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 	assert(SUCCEEDED(hr));
