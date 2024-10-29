@@ -23,6 +23,9 @@ public:
 	//namespace省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
+	// 最大SRV数(最大テクスチャ枚数)
+	static const uint32_t kMaxSRVCount;
+
 	//-------------基本処理-------------//
 
 	DirectXCommon();
@@ -58,12 +61,6 @@ public:
 	/// <returns></returns>
 	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 
-	/// <summary>
-	/// テクスチャファイルの読み込み
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <returns></returns>
-	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
 	/// <summary>
 	/// 初期化
@@ -166,9 +163,8 @@ private:
 	uint32_t descriptorSizeRTV_ = {};
 	uint32_t descriptorSizeDSV_ = {};
 
-	/// <summary>
-	/// 記録時間(FPS固定用)
-	/// </summary>
+	
+	// 記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_ = {};
 
 	//-------------メンバ関数-------------//

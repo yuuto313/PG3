@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	/// <param name="spriteCommon"></param>
 	/// <param name="dxCommon"></param>
-	void Initialize(SpriteCommon* spriteCommon,DirectXCommon* dxCommon);
+	void Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon, std::string textureFilePath);
 
 	/// <summary>
 	/// 更新処理
@@ -33,7 +33,7 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource);
+	void Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource);
 
 	//-------------ゲッター・セッター-------------//
 
@@ -62,6 +62,9 @@ private:
 	float rotation_ = 0.0f;
 	// サイズ
 	Vector2 size_ = { 640.0f,360.0f };
+
+	// テクスチャ番号
+	uint32_t textureIndex_ = 0;
 
 	SpriteCommon* spriteCommon_ = nullptr;
 	DirectXCommon* dxCommon_ = nullptr;
