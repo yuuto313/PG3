@@ -1,6 +1,27 @@
 #pragma once
 #include "DirectXCommon.h"
 
+//-------------------------------------
+// BlendMode
+//-------------------------------------
+
+enum class BlendMode {
+	// ブレンドなし
+	kBlendModeNone,
+	// 通常行αブレンド。デフォルト
+	kBlendModeNormal,
+	// 加算
+	kBlendModeAdd,
+	// 減算
+	kBlendModeSubtract,
+	// 乗算
+	kBlendModeMultily,
+	// スクリーン
+	kBlendModeScreen,
+	// 利用してはいけない
+	kCountOfBlendMode,
+};
+
 /// <summary>
 /// スプライン共通部
 /// </summary>
@@ -17,9 +38,19 @@ public:
 	void Initialize(DirectXCommon* dxCommon);
 
 	/// <summary>
+	/// 更新
+	/// </summary>
+	void ImGui();
+
+	/// <summary>
 	/// 共通描画設定
 	/// </summary>
 	void SetCommonDrawing();
+
+	/// <summary>
+	/// BlendStateの設定
+	/// </summary>
+	void SetBlendState(D3D12_BLEND_DESC& blendDesc, BlendMode blendMode);
 
 	//-------------ゲッター・セッター-------------//
 
@@ -28,6 +59,8 @@ public:
 private:
 
 	//-------------メンバ変数-------------//
+
+	BlendMode blendMode_ = BlendMode::kBlendModeNormal;
 
 	DirectXCommon* dxCommon_;
 
@@ -61,5 +94,7 @@ private:
 	/// グラフィックスパイプラインの生成
 	/// </summary>
 	void CreateGraphicsPipeline();
+
+	static Microsoft::WRL::ComPtr<ID3D12PipelineState> CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device> device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc);
 };
 

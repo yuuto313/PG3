@@ -102,13 +102,16 @@ void Sprite::Update()
 	//-------------------------------------
 
 	CreateWVPMatrix();
+}
 
+void Sprite::ImGui()
+{
 #ifdef _DEBUG
-	ImGui::Begin("Sprite");
-	ImGui::SliderFloat3("transform", &transform_.translate.x, -10.0f, 10.0f);
+	ImGui::Begin("BlendDesc");
+	ImGui::ColorEdit4("Color", &materialData_->color.x);
 	ImGui::End();
 #endif // _DEBUG
-
+	
 }
 
 void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource)
