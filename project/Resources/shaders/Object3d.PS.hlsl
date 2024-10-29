@@ -46,7 +46,22 @@ PixcelShaderOutput main(VertexShaderOutput input)
         output.color = gMaterial.color * textureColor;
     }
     
+    // textureのα値が0.5以下のときPixelを棄却
+    if (textureColor.a <= 0.5)
+    {
+        discard;
+    }
     
+    // textureのα値が0のときにpixelを棄却
+    if (textureColor.a == 0.0)
+    {
+        discard;
+    }
+    // output.colorのα値が0のときにPixelを棄却
+    if (output.color.a == 0.0)
+    {
+        discard;
+    }
     
     return output;
 };
