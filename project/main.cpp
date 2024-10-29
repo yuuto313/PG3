@@ -494,7 +494,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
 		pSpriteCommon->SetCommonDrawing();
-		
+
 		//-------------------------------------
 		// Sprite個々の描画
 		//-------------------------------------

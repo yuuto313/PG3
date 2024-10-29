@@ -128,9 +128,23 @@ void SpriteCommon::CreateRootSignature()
 	//-------------------------------------
 	// PixelShaderからの出力を画面にどのように書き込むかを設定する項目
 
-	// BlendStateの設定
+	// BlendStateの設定(NormalBlend)
 	// すべての色要素を書き込む
+	//すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//ブレンドを有効にするか無効にするかの指定
+	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
+	//ピクセルシェーダーを出力するRGB値に対して実行する操作を指定する
+	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	//SrcBlend操作とDestBlend操作を組み合わせる方法を定義する
+	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	//レンダーターゲットの現在のRGB値に対して実行する操作を指定する
+	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+
+	//α値ブレンド設定。基本的に使わないのでこのまま
+	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
 	//-------------------------------------
 	// RasterizerStateを作成
