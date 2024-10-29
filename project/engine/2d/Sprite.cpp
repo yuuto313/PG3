@@ -2,6 +2,7 @@
 #include "SpriteCommon.h"
 #include "WinApp.h"
 #include "ImGuiManager.h"
+#include "TextureManager.h"
 
 Sprite::Sprite()
 {
@@ -11,7 +12,7 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
+void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon, std::string textureFilePath)
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->spriteCommon_ = spriteCommon;
@@ -51,6 +52,13 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon)
 	//-------------------------------------
 	
 	CreateTrasnformationMatrixData();
+
+	//-------------------------------------
+	// テクスチャ番号の検索と記録
+	//-------------------------------------
+
+	// 単位行列を書き込んでおく
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 }
 
@@ -114,7 +122,7 @@ void Sprite::ImGui()
 	
 }
 
-void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource)
+void Sprite::Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource)
 {
 	//-------------------------------------
 	// VettexBufferViewを設定
@@ -154,7 +162,7 @@ void Sprite::Draw(D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU, Microsoft::WR
 
 	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
 	// 変数を見て利用するSRVを決める
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2,textureSrvHandleGPU); 
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2,TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_)); 
 
 	//-------------------------------------
 	// 描画!(DrawCall/ドローコール)
