@@ -304,18 +304,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライトの初期化
 	//-------------------------------------
 
-	pSprite = new Sprite();
-	pSprite->Initialize(pSpriteCommon, pDxCommon);
-	
-
 	std::string filePath = "resource/uvChecker.png";
 
-	for (uint32_t i = 0; i < 5; ++i) {
-		Sprite* pSprite = new Sprite();
-		pSprite->Initialize(pSpriteCommon, pDxCommon,filePath);
-		pSprites.push_back(pSprite);
-	}
-
+	pSprite = new Sprite();
+	pSprite->Initialize(pSpriteCommon, pDxCommon,filePath);
+	
 
 	//-------------------------------------
 	// テクスチャマネージャの初期化
@@ -512,12 +505,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// Sprite個々の描画
 		//-------------------------------------
 		
-		pSprite->Draw(textureSrvHandleGPU, directionalLightResource);
-
-		for (uint32_t i = 0; i < pSprites.size();++i) {
-			pSprites[i]->Draw(directionalLightResource);
-		}
-
+		pSprite->Draw(directionalLightResource);
 
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
