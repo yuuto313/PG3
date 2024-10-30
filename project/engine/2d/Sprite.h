@@ -103,7 +103,7 @@ private:
 	Vector2 textureLeftTop_ = { 0.0f,0.0f };
 
 	// テクスチャ切り出しサイズ
-	Vector2 textureSize_ = { 100.0f,100.0f };
+	Vector2 textureSize_ = { 100.f,100.0f };
 
 	// テクスチャ番号
 	uint32_t textureIndex_ = 0;
@@ -156,6 +156,11 @@ private:
 	/// WVP行列を作成する
 	/// </summary>
 	void CreateWVPMatrix();
+
+	/// <summary>
+	/// テクスチャサイズをイメージに合わせる
+	/// </summary>
+	void AdjustTextureSize();
 
 };
 
