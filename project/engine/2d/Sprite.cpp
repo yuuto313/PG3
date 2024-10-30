@@ -67,23 +67,41 @@ void Sprite::Update()
 	// 頂点リソースにデータを書き込む
 	//-------------------------------------
 
+	// アンカーポイント反映処理
+	float left = 0.0f - anchorPoint_.x;
+	float right = 1.0f - anchorPoint_.x;
+	float top = 0.0f - anchorPoint_.y;
+	float bottom = 1.0f - anchorPoint_.y;
+
+	// 左右反転
+	if (isFlipX_) {
+		left = -left;
+		right = -right;
+	}
+
+	// 上下反転
+	if (isFlipY_) {
+		top = -top;
+		bottom = -bottom;
+	}
+
 	// １枚目の三角形
 	// 左下
-	vertexData_[0].position = { 0.0f,1.0f,0.0f,1.0f };
+	vertexData_[0].position = { left,bottom,0.0f,1.0f };
 	vertexData_[0].texcoord = { 0.0f,1.0f };
 	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
 	// 左上
-	vertexData_[1].position = { 0.0f,0.0f,0.0f,1.0f };
+	vertexData_[1].position = { left,top,0.0f,1.0f };
 	vertexData_[1].texcoord = { 0.0f,0.0f };
 	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
 
 	// 右下
-	vertexData_[2].position = { 1.0f,1.0f,0.0f,1.0f };
+	vertexData_[2].position = { right,bottom,0.0f,1.0f };
 	vertexData_[2].texcoord = { 1.0f,1.0f };
 	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
 
 	// 右上
-	vertexData_[3].position = { 1.0f,0.0f,0.0f,1.0f };
+	vertexData_[3].position = { right,top,0.0f,1.0f };
 	vertexData_[3].texcoord = { 1.0f,0.0f };
 	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
 

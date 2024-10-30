@@ -224,8 +224,8 @@ void SpriteCommon::CreateRootSignature()
 	// Rasterizerに対する設定
 
 	// RasterizerStateの設定
-	// 裏面（時計回り）を表示しない（ピクセルにしない）
-	rasterizerDesc_.CullMode = D3D12_CULL_MODE_BACK;
+	// カリングしない(裏面も表示させる)
+	rasterizerDesc_.CullMode = D3D12_CULL_MODE_NONE;
 	// 三角形の中を塗りつぶす
 	rasterizerDesc_.FillMode = D3D12_FILL_MODE_SOLID;
 

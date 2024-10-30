@@ -50,13 +50,34 @@ public:
 
 	const Vector4& GetColor()const { return materialData_->color; }
 
+	const Vector2& GetAnchorPoint()const { return anchorPoint_; }
+
+	bool GetIsFlipX()const { return isFlipX_; }
+
+	bool GetIsFlipY()const { return isFlipY_; }
+
+	const Vector2& GetTextureLeftTop()const { return textureLeftTop_; }
+
+	const Vector2& GetTextureSize()const { return textureSize_; }
+
 	void SetPosition(const Vector2& position) { this->position_ = position; }
 	
 	void SetRotation(float rotation) { this->rotation_ = rotation; }
 	
 	void SetSize(const Vector2& size) { this->size_ = size; }
 
-	void SetColor(const Vector4& color) { materialData_->color = color; }
+	void SetColor(const Vector4& color) { this->materialData_->color = color; }
+
+	void SetAnchorPoint(const Vector2& anchorPoint) { this->anchorPoint_ = anchorPoint; }
+
+	void SetFlipX(bool isFlipX) { this->isFlipX_ = isFlipX; }
+
+	void SetFlipY(bool isFlipY) { this->isFlipY_ = isFlipY; }
+
+	void GetTextureLeftTop(const Vector2& textureLeftTop) { this->textureLeftTop_ = textureLeftTop; }
+
+	void GetTextureSize(const Vector2& textureSize) { this->textureSize_ = textureSize; }
+
 
 private:
 	//-------------メンバ変数-------------//
@@ -67,6 +88,22 @@ private:
 	float rotation_ = 0.0f;
 	// サイズ
 	Vector2 size_ = { 640.0f,360.0f };
+
+	// アンカーポイント
+	// {0,0} = 左上、{0,1} = 左下
+	// {0.5,0.5} = 中央、{-0.5,-0.5} = 画面外
+	Vector2 anchorPoint_ = { 0.0f,0.0f };
+
+	// 左右フリップ
+	bool isFlipX_ = false;
+	// 上下フリップ
+	bool isFlipY_ = false;
+
+	// テクスチャ左上座標
+	Vector2 textureLeftTop_ = { 0.0f,0.0f };
+
+	// テクスチャ切り出しサイズ
+	Vector2 textureSize_ = { 100.0f,100.0f };
 
 	// テクスチャ番号
 	uint32_t textureIndex_ = 0;

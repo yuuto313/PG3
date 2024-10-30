@@ -285,7 +285,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	TextureManager::GetInstance()->Initialize(pDxCommon);
 	//TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
-	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("resource/eto_tora_family.png");
 	
 	//-------------------------------------
 	// Audioの初期化
@@ -314,7 +314,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	for (uint32_t i = 0; i < 3; ++i) {
 		Sprite* pSprite = new Sprite();
-		pSprite->Initialize(pSpriteCommon, pDxCommon, "resource/uvChecker.png");
+		pSprite->Initialize(pSpriteCommon, pDxCommon, "resource/eto_tora_family.png");
+
+		Vector2 position = pSprite->GetPosition();
+		position = Vector2(i * 300.0f, i + 50.0f);
+		pSprite->SetPosition(position);
+
+		Vector2 size = pSprite->GetSize();
+		size = Vector2(128.0f, 128.0f);
+		pSprite->SetSize(size);
+
 		pSprites.push_back(pSprite);
 	}
 
@@ -416,8 +425,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
 			pSprites[i]->Update();
-			pSprites[i]->SetPosition(Vector2(i * 300.0f, i + 50.0f));
-			pSprites[i]->SetSize(Vector2(128.0f, 128.0f));
+			float rotation = pSprites[i]->GetRotation();
+			rotation += 0.01f;
+			pSprites[i]->SetRotation(rotation);
 		}
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
