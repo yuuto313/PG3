@@ -91,8 +91,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	// テクスチャデータの要素番号をSRVのインデックスとする
 	uint32_t srvIndex = static_cast<uint32_t>(textureDatas_.size() - 1) + kSRVIndexTop;
 
-	textureData.srvHandleCPU = dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
-	textureData.srvHandleGPU = dxCommon_->GetSRVGPUDescriptorHandel(srvIndex);
+	
 
 	//-------------------------------------
 	// SRVの設定を行う
@@ -105,12 +104,9 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 
 	// SRVを作成するDescriptorHeapの場所を決める
-	textureData.srvHandleCPU = dxCommon_->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	textureData.srvHandleGPU = dxCommon_->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-
 	// 先頭はImGuiが使っているのでその次を使う
-	textureData.srvHandleCPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureData.srvHandleGPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureData.srvHandleCPU = dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
+	textureData.srvHandleGPU = dxCommon_->GetSRVGPUDescriptorHandel(srvIndex);
 
 	//-------------------------------------
 	// 設定を基にSRVの生成
