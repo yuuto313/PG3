@@ -70,6 +70,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	// テクスチャデータ追加
 	//-------------------------------------
 	
+	// テクスチャデータを追加
 	textureDatas_.resize(textureDatas_.size() + 1);
 	// 追加したテクスチャデータの参照を取得する
 	TextureData& textureData = textureDatas_.back();
@@ -113,6 +114,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	//-------------------------------------
 	// 設定を基にSRVの生成
 	//-------------------------------------
+
 	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureSrvHandleCPU);
 
 }

@@ -33,6 +33,7 @@ private:
 	// SRVインデックスの開始番号
 	static uint32_t kSRVIndexTop;
 
+private:// シングルトン設計
 	static TextureManager* instance;
 
 	/// <summary>
