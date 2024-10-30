@@ -284,7 +284,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	TextureManager::GetInstance()->Initialize(pDxCommon);
-	//TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
 	TextureManager::GetInstance()->LoadTexture("resource/eto_tora_family.png");
 	
 	//-------------------------------------
