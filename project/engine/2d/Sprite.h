@@ -58,6 +58,8 @@ public:
 
 	void SetColor(const Vector4& color) { materialData_->color = color; }
 
+	void SetTextureIndex(uint32_t textureIndex) { textureIndex_ = textureIndex; }
+
 private:
 	//-------------メンバ変数-------------//
 

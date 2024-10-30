@@ -82,6 +82,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
+	dxCommon_->UploadTextureData(textureData.resource, mipImages);
 
 	//-------------------------------------
 	// デスクリプタハンドルの計算
@@ -132,10 +133,12 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 		// 読み込み済みなら要素番号を返す
 		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas_.begin(), it));
 		return textureIndex;
+	} else {
+		// 検索がヒットしない場合は事前に適切に読み込みをしていないので停止させる
+		assert(0);
+		return 0;
 	}
 
-	assert(0);
-	return 0;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureIndex)

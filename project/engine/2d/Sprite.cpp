@@ -57,7 +57,6 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon, std
 	// テクスチャ番号の検索と記録
 	//-------------------------------------
 
-	// 単位行列を書き込んでおく
 	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
 
 }
