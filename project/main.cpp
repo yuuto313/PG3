@@ -321,8 +321,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else if (i == 1) {
 			texturePath = "resource/uvChecker.png";
 		} else {
-			texturePath = "resource/monsterBall.png"; // 任意の別テクスチャ
+			texturePath = "resource/monsterBall.png";
 		}
+
 
 		pSprite->Initialize(pSpriteCommon, pDxCommon, texturePath);
 
