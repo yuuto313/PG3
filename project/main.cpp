@@ -314,7 +314,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	for (uint32_t i = 0; i < 3; ++i) {
 		Sprite* pSprite = new Sprite();
-		pSprite->Initialize(pSpriteCommon, pDxCommon, "resource/uvChecker.png");
+		// スプライトごとに異なるテクスチャを割り当てる
+		std::string texturePath;
+		if (i == 0) {
+			texturePath = "resource/monsterBall.png";
+		} else if (i == 1) {
+			texturePath = "resource/uvChecker.png";
+		} else {
+			texturePath = "resource/monsterBall.png"; // 任意の別テクスチャ
+		}
+
+		pSprite->Initialize(pSpriteCommon, pDxCommon, texturePath);
 
 		Vector2 position = pSprite->GetPosition();
 		position = Vector2(i * 300.0f, i + 50.0f);
