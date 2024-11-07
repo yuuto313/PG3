@@ -4,7 +4,7 @@
 /// <summary>
 /// マテリアル(構造体)
 /// </summary>
-struct Material {
+struct Material final{
 	Vector4 color;
 	int32_t enableLighting;
 	float padding[3];
@@ -12,3 +12,13 @@ struct Material {
 
 };
 
+
+
+/// <summary>
+/// マテリアルデータ(構造体)
+/// </summary>
+struct MaterialData final{
+	std::string textureFilePath;
+	// テクスチャ番号を保存する
+	uint32_t textureIndex = 0;
+};

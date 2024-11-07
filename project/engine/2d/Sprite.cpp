@@ -12,11 +12,10 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon, std::string textureFilePath)
+void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	// 引数で受け取ってメンバ変数に記録する
-	this->spriteCommon_ = spriteCommon;
-	dxCommon_ = dxCommon;
+	this->pSpriteCommon_ = spriteCommon;
 
 	//-------------------------------------
 	// Transform情報を作る
@@ -157,21 +156,21 @@ void Sprite::Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourc
 
 	// Spriteの描画。変更が必要なものだけ変更する
 	// VBVを設定する
-	dxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	
 	//-------------------------------------
 	// IndexBufferViewを設定
 	//-------------------------------------
 	
 	// IBVを設定
-	dxCommon_->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 
 	//-------------------------------------
 	// マテリアルCBufferの場所を設定
 	//-------------------------------------
 
 	//マテリアルCBufferの場所を設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 
 	//-------------------------------------
 	// 座標変換行列CBufferの場所を設定
@@ -179,9 +178,9 @@ void Sprite::Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourc
 	
 	// wvp用のCBufferの場所を設定
 	// RootParameter[1]に対してCBVの設定
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrix_->GetGPUVirtualAddress());	
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 	
-	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 	//-------------------------------------
 	// SRVのDescriptorTableの先頭を設定
@@ -189,13 +188,13 @@ void Sprite::Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourc
 
 	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
 	// 変数を見て利用するSRVを決める
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2,TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_)); 
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2,TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
 
 	//-------------------------------------
 	// 描画!(DrawCall/ドローコール)
 	//-------------------------------------
 
-	dxCommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	pSpriteCommon_->GetDxCommon()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 }
 
@@ -205,7 +204,7 @@ void Sprite::CreateVertexData()
 	// VertexResourceを作る
 	//-------------------------------------
 
-	vertexResource_ = dxCommon_->CreateBufferResource(sizeof(VertexData) * 4);
+	vertexResource_ = pSpriteCommon_->GetDxCommon()->CreateBufferResource(sizeof(VertexData) * 4);
 
 	//-------------------------------------
 	// VertexBufferViewを作成する(値を設定するだけ)
@@ -232,7 +231,7 @@ void Sprite::CreateIndexData()
 	// IndexResourceを作る
 	//-------------------------------------
 
-	indexResource_ = dxCommon_->CreateBufferResource(sizeof(uint32_t) * 6);
+	indexResource_ = pSpriteCommon_->GetDxCommon()->CreateBufferResource(sizeof(uint32_t) * 6);
 
 	//-------------------------------------
 	// IndexBufferViewを作成する(値を設定するだけ)
@@ -259,7 +258,7 @@ void Sprite::CreateMaterialData()
 	// マテリアルリソースを作る
 	//-------------------------------------
 
-	materialResource_ = dxCommon_->CreateBufferResource(sizeof(Material));
+	materialResource_ = pSpriteCommon_->GetDxCommon()->CreateBufferResource(sizeof(Material));
 
 	//-------------------------------------
 	// マテリアルリソースにデータを書き込むためのアドレスを取得してmaterialDataに割り当てる
@@ -287,13 +286,13 @@ void Sprite::CreateTrasnformationMatrixData()
 	// 座標変換行列リソースを作る
 	//-------------------------------------
 
-	transformationMatrix_ = dxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	transformationMatrixResource_ = pSpriteCommon_->GetDxCommon()->CreateBufferResource(sizeof(TransformationMatrix));
 	
 	//-------------------------------------
 	// 座標変換行列リソースにデータを書き込むためのアドレスを取得してtransformationMatrixDataに割り当てる
 	//-------------------------------------
 
-	transformationMatrix_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 
 	//-------------------------------------
 	// 単位行列を書き込んでおく

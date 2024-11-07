@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	/// <param name="spriteCommon"></param>
 	/// <param name="dxCommon"></param>
-	void Initialize(SpriteCommon* spriteCommon, DirectXCommon* dxCommon, std::string textureFilePath);
+	void Initialize(SpriteCommon* spriteCommon, std::string textureFilePath);
 
 	/// <summary>
 	/// 更新処理
@@ -108,8 +108,7 @@ private:
 	// テクスチャ番号
 	uint32_t textureIndex_ = 0;
 
-	SpriteCommon* spriteCommon_ = nullptr;
-	DirectXCommon* dxCommon_ = nullptr;
+	SpriteCommon* pSpriteCommon_ = nullptr;
 
 	Transform transform_ = {};
 	Transform uvTransform_ = {};
@@ -118,7 +117,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrix_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 
 	// バッファリソース内のデータを指すポインタ
 	VertexData* vertexData_ = nullptr;
