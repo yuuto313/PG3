@@ -45,7 +45,7 @@ public:
 	/// <summary>
 	/// 共通描画設定
 	/// </summary>
-	void SetCommonDrawing();
+	void SetDraw();
 
 	/// <summary>
 	/// BlendStateの設定

@@ -343,7 +343,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	pObject3dCommon = new Object3dCommon();
-	pObject3dCommon->Initialize();
+	pObject3dCommon->Initialize(pDxCommon);
 
 	//-------------------------------------
 	// 3dオブジェクトの初期化
@@ -480,8 +480,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
 		pDxCommon->PreDraw();
 
+		//-------------------------------------
+		// スプライト描画準備
+		//-------------------------------------
+
 		// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
-		pSpriteCommon->SetCommonDrawing();
+		pSpriteCommon->SetDraw();
 
 		//-------------------------------------
 		// Sprite個々の描画
@@ -490,6 +494,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
 			pSprites[i]->Draw(directionalLightResource);
 		}
+
+		//-------------------------------------
+		// 3dオブジェクト描画準備
+		//-------------------------------------
+
+		// 3dオブジェクトの描画準備。3dオブジェクトの描画に共通のグラフィックスコマンドを積む
+		pObject3dCommon->SetDraw();
+
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
 		//-------------------------------------

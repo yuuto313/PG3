@@ -38,7 +38,7 @@ void SpriteCommon::ImGui()
 }
 
 
-void SpriteCommon::SetCommonDrawing()
+void SpriteCommon::SetDraw()
 {
 	// RootSignatureを設定。PSOに設定してるけど別途設定が必要
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());

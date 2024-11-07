@@ -131,8 +131,9 @@ void Object3dCommon::CreateRootSignature()
 	//-------------------------------------
 	// PixelShaderからの出力を画面にどのように書き込むかを設定する項目
 
-	// BlendStateの設定(NormalBlend)
-	SetBlendState(blendDesc_, blendMode_);
+	// BlendStateの設定
+	// すべての色要素を書き込む
+	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 	//-------------------------------------
 	// RasterizerStateを作成
