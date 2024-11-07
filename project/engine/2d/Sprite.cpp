@@ -148,7 +148,7 @@ void Sprite::ImGui()
 	
 }
 
-void Sprite::Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource)
+void Sprite::Draw()
 {
 	//-------------------------------------
 	// VettexBufferViewを設定
@@ -179,8 +179,6 @@ void Sprite::Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResourc
 	// wvp用のCBufferの場所を設定
 	// RootParameter[1]に対してCBVの設定
 	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
-	
-	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 	//-------------------------------------
 	// SRVのDescriptorTableの先頭を設定

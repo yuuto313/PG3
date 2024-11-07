@@ -14,6 +14,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	//-------------------------------------
 	// モデル読み込み
 	//-------------------------------------
+
 	modelData_ = LoadObjFile("resources", "Plane.obj");
 
 	//-------------------------------------
@@ -61,25 +62,6 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 
 void Object3d::Update()
 {
-	// 左下
-	vertexData_[0].position = { left,bottom,0.0f,1.0f };
-	vertexData_[0].texcoord = { tex_left,tex_bottom };
-	vertexData_[0].normal = { 0.0f,0.0f,-1.0f };
-	// 左上
-	vertexData_[1].position = { left,top,0.0f,1.0f };
-	vertexData_[1].texcoord = { tex_left,tex_top };
-	vertexData_[1].normal = { 0.0f,0.0f,-1.0f };
-
-	// 右下
-	vertexData_[2].position = { right,bottom,0.0f,1.0f };
-	vertexData_[2].texcoord = { tex_right,tex_bottom };
-	vertexData_[2].normal = { 0.0f,0.0f,-1.0f };
-
-	// 右上
-	vertexData_[3].position = { right,top,0.0f,1.0f };
-	vertexData_[3].texcoord = { tex_right,tex_top };
-	vertexData_[3].normal = { 0.0f,0.0f,-1.0f };
-
 	//-------------------------------------
 	// Transform情報を作る
 	//-------------------------------------

@@ -38,7 +38,7 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource);
+	void Draw();
 
 	//-------------ゲッター・セッター-------------//
 

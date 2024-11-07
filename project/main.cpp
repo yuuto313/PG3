@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SpriteCommon* pSpriteCommon = nullptr;	
 	std::vector<Sprite*> pSprites;
 	Object3dCommon* pObject3dCommon = nullptr;
-	//Object3d* pObject3d = nullptr;
+	Object3d* pObject3d = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -207,8 +207,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 3dオブジェクトの初期化
 	//-------------------------------------
 
-	//pObject3d = new Object3d();
-	//pObject3d->Initialize(pObject3dCommon);
+	pObject3d = new Object3d();
+	pObject3d->Initialize(pObject3dCommon);
 	
 
 #pragma endregion 基盤システムの初期化
@@ -246,41 +246,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 #endif
 
-	//-------------------------------------
-	//ModelDataを使ったResourceの作成
-	//-------------------------------------
-
-	////モデル読み込み
-	//ModelData modelData = LoadObjFile("resource", "axis.obj");
-	////頂点リソースを作る
-	//Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = dxCommon->CreateBufferResource(sizeof(VertexData) * modelData.vertices.size());
-	////頂点バッファビューを作成する
-	//D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	////リソースの先頭アドレスから使う
-	//vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	////使用するリソースのサイズは頂点のサイズ
-	//vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
-	////１頂点当たりのサイズ
-	//vertexBufferView.StrideInBytes = sizeof(VertexData);
-
-	////頂点リソースにデータを書き込む
-	//VertexData* vertexData = nullptr;
-	////書き込むためのアドレスを取得
-	//vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	////頂点データをリソースにコピー
-	//std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
-
-	//-------------------------------------
-	//平行光源用のResourceを作成
-	//-------------------------------------
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = pDxCommon->CreateBufferResource(sizeof(DirectionalLight));
-	DirectionalLight* directionalLightData = nullptr;
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-	//デフォルトの値は以下にしておく
-	directionalLightData->color = { 1.0f,1.0f,1.0f };
-	directionalLightData->direction = MyMath::Normalize({ 0.0f,-1.0f,0.0f });
-	directionalLightData->intensity = 1.0f;
 
 	//テクスチャ切り替え用のbool変数
 	bool useMonsterBall = true;
@@ -291,6 +256,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			//ゲームループを抜ける
 			break;
 		}
+
 		//-------------------------------------
 		//フレームの始まる旨を告げる
 		//-------------------------------------
@@ -313,8 +279,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			rotation += 0.01f;
 			pSprites[i]->SetRotation(rotation);
 		}
+
 		//-------------------------------------
-		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
+		// 3dオブジェクトの更新
+		//-------------------------------------
+
+		pObject3d->Update();
+
+		//-------------------------------------
+		// ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
 		//-------------------------------------
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 		
@@ -324,12 +297,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
 			pSprites[i]->ImGui();
 		}
-	
-		//-------------------------------------
-		// ライトの向きを正規化
-		//-------------------------------------
-
-		directionalLightData->direction = MyMath::Normalize(directionalLightData->direction);
 		
 		//-------------------------------------
 		// 描画前処理
@@ -350,7 +317,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//-------------------------------------
 		
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
-			pSprites[i]->Draw(directionalLightResource);
+			pSprites[i]->Draw();
 		}
 
 		//-------------------------------------
@@ -359,6 +326,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 3dオブジェクトの描画準備。3dオブジェクトの描画に共通のグラフィックスコマンドを積む
 		pObject3dCommon->SetDraw();
+
+		//-------------------------------------
+		// 3dオブジェクト個々の描画
+		//-------------------------------------
+
+		pObject3d->Draw();
 
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
@@ -417,7 +390,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	for (uint32_t i = 0; i < pSprites.size(); ++i) {
 		delete pSprites[i];
 	}
-	//delete pObject3d;
+	delete pObject3d;
 	delete pObject3dCommon;
 	delete pSpriteCommon;
 	delete pImguiManager;
