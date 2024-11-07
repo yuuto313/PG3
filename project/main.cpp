@@ -30,6 +30,8 @@
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "TextureManager.h"
+#include "Object3dCommon.h"
+#include "Object3d.h"
 #include "Audio.h"
 
 #include "Logger.h"
@@ -249,6 +251,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	ImGuiManager* pImguiManager = nullptr;
 	SpriteCommon* pSpriteCommon = nullptr;	
 	std::vector<Sprite*> pSprites;
+	Object3dCommon* pObject3dCommon = nullptr;
+	Object3d* pObject3d = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -333,6 +337,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		pSprites.push_back(pSprite);
 	}
+
+	//-------------------------------------
+	// 3dオブジェクト共通部の初期化
+	//-------------------------------------
+
+	pObject3dCommon = new Object3dCommon();
+	pObject3dCommon->Initialize();
+
+	//-------------------------------------
+	// 3dオブジェクトの初期化
+	//-------------------------------------
+
+	pObject3d = new Object3d();
+	pObject3d->Initialize();
+	
 
 #pragma endregion 基盤システムの初期化
 
@@ -528,6 +547,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	for (uint32_t i = 0; i < pSprites.size(); ++i) {
 		delete pSprites[i];
 	}
+	delete pObject3d;
+	delete pObject3dCommon;
 	delete pSpriteCommon;
 	delete pImguiManager;
 	delete pAudio;
