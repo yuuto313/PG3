@@ -24,7 +24,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
 
 	// 読み込んだテクスチャの番号を取得
-	TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData_.material.textureFilePath);
+	modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData_.material.textureFilePath);
 
 	//-------------------------------------
 	// Transform情報を作る
@@ -85,6 +85,46 @@ void Object3d::Update()
 	//-------------------------------------
 
 	CreateWVPMatrix();
+}
+
+void Object3d::Draw()
+{
+
+	//-------------------------------------
+	// VertexBufferViewを設定する
+	//-------------------------------------
+
+	pObject3dCommon_->GetDxCommon()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+
+	//-------------------------------------
+	// マテリアルCBufferの場所を設定
+	//-------------------------------------
+
+	pObject3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+
+	//-------------------------------------
+	// 座標変換行列の場所を設定
+	//-------------------------------------
+	
+	pObject3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
+
+	//-------------------------------------
+	// 並行光源CBufferの場所を設定
+	//-------------------------------------
+
+	pObject3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource_->GetGPUVirtualAddress());
+
+	//-------------------------------------
+	// SRVのDescriptorTableの先頭を設定
+	//-------------------------------------
+	
+	pObject3dCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
+
+	//-------------------------------------
+	// 描画！
+	//-------------------------------------
+
+	pObject3dCommon_->GetDxCommon()->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), 1, 0, 0);
 }
 
 void Object3d::CreateVertexData()
@@ -198,19 +238,26 @@ void Object3d::CreateWVPMatrix()
 	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	//-------------------------------------
-	// ViewMatrixを作って単位行列を代入
+	// cameraTransformからcameraMatrixを作る
+	//-------------------------------------
+	
+	Matrix4x4 cameraMatrix = MyMath::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
+	
+	//-------------------------------------
+	// cameraMatrixからviewMatrixを作る
 	//-------------------------------------
 
-	Matrix4x4 viewMatrix = MyMath::MakeIdentity4x4();
+	Matrix4x4 viewMatrix = MyMath::Inverse(cameraMatrix);
 
 	//-------------------------------------
-	// ProjectionMatrixを作って並行投影行列を書き込む
+	// projectionMarixを作って透視投影行列を書き込む
 	//-------------------------------------
 
-	Matrix4x4 projectionMatrix = MyMath::MakeOrthographicMatrix(0.0f, 0.0f, float(WinApp::kClientWidth), float(WinApp::kClientHeight), 0.0f, 100.f);
+	Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.f);
 
-	Matrix4x4 wvpMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData_->WVP = wvpMatrix;
+	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+
+	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
 }
 

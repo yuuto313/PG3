@@ -40,6 +40,11 @@ public:
 	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw();
+
 private:// メンバ変数
 
 	Object3dCommon* pObject3dCommon_ = nullptr;
