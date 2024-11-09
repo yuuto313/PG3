@@ -15,7 +15,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	// モデル読み込み
 	//-------------------------------------
 
-	modelData_ = LoadObjFile("resources", "Plane.obj");
+	modelData_ = LoadObjFile("resource", "plane.obj");
 
 	//-------------------------------------
 	// テクスチャ読み込み
@@ -320,7 +320,7 @@ ModelData Object3d::LoadObjFile(const std::string& directoryPath, const std::str
 		if (identifier == "v") {
 			Vector4 position;
 			s >> position.x >> position.y >> position.z;
-			position.x *= -1.0f;
+			//position.x *= -1.0f;
 			position.w = 1.0f;
 			positions.push_back(position);
 		} else if (identifier == "vt") {
@@ -330,7 +330,7 @@ ModelData Object3d::LoadObjFile(const std::string& directoryPath, const std::str
 		} else if (identifier == "vn") {
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
-			normal.x *= -1.0f;
+			//normal.x *= -1.0f;
 			normals.push_back(normal);
 		} else if (identifier == "f") {
 			//三角形を作る
