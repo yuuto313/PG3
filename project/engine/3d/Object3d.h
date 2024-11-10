@@ -1,18 +1,12 @@
 #pragma once
-#include "Material.h"
-#include "VertexData.h"
 #include "TransformationMatrix.h"
 #include "MyTransform.h"
+
+#include "Model.h"
 
 #include <d3d12.h>
 #include <wrl.h>
 #include <vector>
-
-//ModelData構造体
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
 
 //平行光源
 struct DirectionalLight{
@@ -45,43 +39,42 @@ public:
 	/// </summary>
 	void Draw();
 
+public:// ゲッター・セッター
+
+	const Vector3& GetScale()const { return transform_.scale; }
+	const Vector3& GetRotate()const { return transform_.rotate; }
+	const Vector3& GetTranslate()const { return transform_.translate; }
+
+	void SetScale(const Vector3& scale) { transform_.scale = scale; }
+	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
+	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+
+	/// <summary>
+	/// Modelのセッター
+	/// </summary>
+	/// <param name="model"></param>
+	void SetModel(Model* model) { this->pModel_ = model; }
+
+
 private:// メンバ変数
 
 	Object3dCommon* pObject3dCommon_ = nullptr;
-
-	// objファイルのデータ
-	ModelData modelData_;
+	Model* pModel_ = nullptr;
 
 	// Transform
 	Transform transform_;
 	Transform cameraTransform_;
 
 	// バッファリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource_;
 
 	// バッファリソース内のデータを指すポインタ
-	VertexData* vertexData_ = nullptr;
-	Material* materialData_ = nullptr;
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 	DirectionalLight* directionalLightData_ = nullptr;
 
-	// バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 
 private:// メンバ関数
-
-	/// <summary>
-	/// 頂点データ作成
-	/// </summary>
-	void CreateVertexData();
-
-	/// <summary>
-	/// マテリアルデータ作成
-	/// </summary>
-	void CreateMaterialData();
 
 	/// <summary>
 	/// 座標変換行列データ作成
@@ -98,20 +91,5 @@ private:// メンバ関数
 	/// </summary>
 	void CreateWVPMatrix();
 
-	/// <summary>
-	/// .mtlファイルの読み取り
-	/// </summary>
-	/// <param name="directoryPath"></param>
-	/// <param name="filename"></param>
-	/// <returns></returns>
-	static MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
-
-	/// <summary>
-	/// .objファイルの読み取り
-	/// </summary>
-	/// <param name="directoryPath"></param>
-	/// <param name="filename"></param>
-	/// <returns></returns>
-	static ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
 };
 

@@ -1,28 +1,3 @@
-#include <Windows.h>
-#include <cstdint>
-#include <string>
-#include <format>
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#include <d3d12.h>
-#pragma comment(lib,"d3d12.lib")
-#include <dxgi1_6.h>
-#pragma comment(lib,"dxgi.lib")
-#include <cassert>
-#include <dxgidebug.h>
-#pragma comment(lib,"dxguid.lib")
-
-#include <dxcapi.h>
-#pragma comment(lib,"dxcompiler.lib")
-
-#include "externals/DirectXTex/DirectXTex.h"
-
-#include <fstream>
-#include <sstream>
-
-#include <wrl.h>
-
 #include "Input.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
@@ -32,6 +7,9 @@
 #include "TextureManager.h"
 #include "Object3dCommon.h"
 #include "Object3d.h"
+#include "ModelCommon.h"
+#include "Model.h"
+
 #include "Audio.h"
 
 #include "Logger.h"
@@ -110,7 +88,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SpriteCommon* pSpriteCommon = nullptr;	
 	std::vector<Sprite*> pSprites;
 	Object3dCommon* pObject3dCommon = nullptr;
-	Object3d* pObject3d = nullptr;
+	std::vector<Object3d*> pObjects3d;
+	ModelCommon* pModelCommon = nullptr;
+	Model* pModel = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -174,7 +154,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライトの初期化
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < 3; ++i) {
+	for (uint32_t i = 0; i < 1; ++i) {
 		Sprite* pSprite = new Sprite();
 		// スプライトごとに異なるテクスチャを割り当てる
 		std::string texturePath;
@@ -207,9 +187,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 3dオブジェクトの初期化
 	//-------------------------------------
 
-	pObject3d = new Object3d();
-	pObject3d->Initialize(pObject3dCommon);
+	for (uint32_t i = 0; i < 2; ++i) {
+		Object3d* pObject3d = new Object3d();
+
+		pObject3d->Initialize(pObject3dCommon);
+
+		Vector3 translate = pObject3d->GetTranslate();
+		translate = Vector3(i * 1.0f, i + 1.0f);
+		pObject3d->SetTranslate(translate);
+
+		pObjects3d.push_back(pObject3d);
+	}
+
+	//-------------------------------------
+	// 3dモデルの共通部の初期化
+	//-------------------------------------
 	
+	pModelCommon = new ModelCommon();
+	pModelCommon->Initialize(pDxCommon);
+
+	//-------------------------------------
+	// 3dモデルの初期化
+	//-------------------------------------
+
+	pModel = new Model();
+	pModel->Initialize(pModelCommon);
 
 #pragma endregion 基盤システムの初期化
 
@@ -245,10 +247,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	}
 #endif
-
-
-	//テクスチャ切り替え用のbool変数
-	bool useMonsterBall = true;
+	for (uint32_t i = 0; i < 2; i++) {
+		pObjects3d[i]->SetModel(pModel);
+	}
 
 	while (true) {
 		//Windowのメッセージ処理
@@ -284,7 +285,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 3dオブジェクトの更新
 		//-------------------------------------
 
-		pObject3d->Update();
+		for (uint32_t i = 0; i < 2; i++) {
+			pObjects3d[i]->Update();
+		}
 
 		//-------------------------------------
 		// ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
@@ -331,7 +334,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 3dオブジェクト個々の描画
 		//-------------------------------------
 
-		pObject3d->Draw();
+		for (uint32_t i = 0; i < 2; i++) {
+			pObjects3d[i]->Draw();
+		}
 
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
@@ -387,11 +392,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
+	
+	delete pModel;
+	delete pModelCommon;
+	for (uint32_t i = 0; i < 2; i++) {
+		delete pObjects3d[i];
+	}
+	delete pObject3dCommon;
 	for (uint32_t i = 0; i < pSprites.size(); ++i) {
 		delete pSprites[i];
 	}
-	delete pObject3d;
-	delete pObject3dCommon;
 	delete pSpriteCommon;
 	delete pImguiManager;
 	delete pAudio;
