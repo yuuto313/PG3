@@ -4,7 +4,7 @@
 #include <cassert>
 #include <fstream>
 
-void Model::Initialize(ModelCommon* modelCommon)
+void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->pModelCommon_ = modelCommon;
@@ -13,7 +13,7 @@ void Model::Initialize(ModelCommon* modelCommon)
 	// モデル読み込み
 	//-------------------------------------
 
-	modelData_ = LoadObjFile("resource", "plane.obj");
+	modelData_ = LoadObjFile(directoryPath,filename);
 
 	//-------------------------------------
 	// 頂点データ作成

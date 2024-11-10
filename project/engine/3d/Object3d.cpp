@@ -66,6 +66,11 @@ void Object3d::Draw()
 
 }
 
+void Object3d::SetModel(const std::string& filePath)
+{
+	pModel_ = ModelManager::GetInstance()->FindModel(filePath);
+}
+
 void Object3d::CreateTrasnformationMatrixData()
 {
 	//-------------------------------------

@@ -7,8 +7,7 @@
 #include "TextureManager.h"
 #include "Object3dCommon.h"
 #include "Object3d.h"
-#include "ModelCommon.h"
-#include "Model.h"
+#include "ModelManager.h"
 
 #include "Audio.h"
 
@@ -89,8 +88,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	std::vector<Sprite*> pSprites;
 	Object3dCommon* pObject3dCommon = nullptr;
 	std::vector<Object3d*> pObjects3d;
-	ModelCommon* pModelCommon = nullptr;
-	Model* pModel = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -159,19 +156,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// スプライトごとに異なるテクスチャを割り当てる
 		std::string texturePath;
 		if (i == 0) {
-			texturePath = "resource/monsterBall.png";
+			texturePath = "resource/uvChecker.png";
 		} else if (i == 1) {
 			texturePath = "resource/uvChecker.png";
 		} else {
 			texturePath = "resource/monsterBall.png";
 		}
 
-
 		pSprite->Initialize(pSpriteCommon, texturePath);
-
-		Vector2 position = pSprite->GetPosition();
-		position = Vector2(i * 300.0f, i + 50.0f);
-		pSprite->SetPosition(position);
 
 		pSprites.push_back(pSprite);
 	}
@@ -182,6 +174,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	pObject3dCommon = new Object3dCommon();
 	pObject3dCommon->Initialize(pDxCommon);
+
+	//-------------------------------------
+	// 3dモデルマネージャの初期化
+	//-------------------------------------
+
+	ModelManager::GetInstance()->Initialize(pDxCommon);
+	// .objファイルからモデルを読み込む
+	ModelManager::GetInstance()->LoadModel("plane.obj");
+	ModelManager::GetInstance()->LoadModel("axis.obj");
 
 	//-------------------------------------
 	// 3dオブジェクトの初期化
@@ -195,23 +196,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 translate = pObject3d->GetTranslate();
 		translate = Vector3(i * 1.0f, i + 1.0f);
 		pObject3d->SetTranslate(translate);
+		pObject3d->SetModel("axis.obj");
 
 		pObjects3d.push_back(pObject3d);
 	}
 
-	//-------------------------------------
-	// 3dモデルの共通部の初期化
-	//-------------------------------------
-	
-	pModelCommon = new ModelCommon();
-	pModelCommon->Initialize(pDxCommon);
-
-	//-------------------------------------
-	// 3dモデルの初期化
-	//-------------------------------------
-
-	pModel = new Model();
-	pModel->Initialize(pModelCommon);
 
 #pragma endregion 基盤システムの初期化
 
@@ -247,9 +236,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	}
 #endif
-	for (uint32_t i = 0; i < 2; i++) {
-		pObjects3d[i]->SetModel(pModel);
-	}
 
 	while (true) {
 		//Windowのメッセージ処理
@@ -276,9 +262,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
 			pSprites[i]->Update();
-			float rotation = pSprites[i]->GetRotation();
-			rotation += 0.01f;
-			pSprites[i]->SetRotation(rotation);
 		}
 
 		//-------------------------------------
@@ -365,6 +348,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	CoUninitialize();
 
 	//-------------------------------------
+	// 3dモデルマネージャの終了処理
+	//-------------------------------------
+
+	ModelManager::GetInstance()->Finalize();
+
+	//-------------------------------------
 	// テクスチャマネージャの終了処理
 	//-------------------------------------
 
@@ -392,9 +381,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
-	
-	delete pModel;
-	delete pModelCommon;
 	for (uint32_t i = 0; i < 2; i++) {
 		delete pObjects3d[i];
 	}

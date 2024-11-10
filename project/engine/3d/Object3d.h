@@ -3,6 +3,7 @@
 #include "MyTransform.h"
 
 #include "Model.h"
+#include "ModelManager.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -50,11 +51,10 @@ public:// ゲッター・セッター
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 
 	/// <summary>
-	/// Modelのセッター
+	/// モデル検索してセットする
 	/// </summary>
-	/// <param name="model"></param>
-	void SetModel(Model* model) { this->pModel_ = model; }
-
+	/// <param name="filePath"></param>
+	void SetModel(const std::string& filePath);
 
 private:// メンバ変数
 
