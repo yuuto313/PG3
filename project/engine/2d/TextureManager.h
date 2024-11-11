@@ -2,10 +2,12 @@
 #include <string>
 #include <d3d12.h>
 #include <wrl.h>
+#include <unordered_map>
 
 #include "externals/DirectXTex/DirectXTex.h"
 
 #include "DirectXCommon.h"
+#include "SrvManager.h"
 
 /// <summary>
 /// テクスチャマネージャー
@@ -18,12 +20,12 @@ private:
 	/// </summary>
 	struct TextureData
 	{
-		// 画像ファイルのパス
-		std::string filePath;
 		// 画像の幅や高さなどの情報
 		DirectX::TexMetadata metadata;
 		// テクスチャリソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
+		// srvインデックス
+		uint32_t srvIndex;
 		// SRV作成時に必要なCPUハンドル
 		D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCPU;
 		// 描画コマンドに必要なGPUハンドル
@@ -65,7 +67,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(DirectXCommon* dxCommon);
+	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
 
 	/// <summary>
 	/// 終了
@@ -102,8 +104,9 @@ public:
 
 private:
 	// テクスチャデータ
-	std::vector<TextureData> textureDatas_;
+	std::unordered_map<std::string,TextureData> textureDatas_;
 
 	DirectXCommon* dxCommon_ = nullptr;
+	SrvManager* pSrvManager_ = nullptr;
 };
 

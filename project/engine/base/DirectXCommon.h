@@ -54,6 +54,15 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(const DirectX::TexMetadata& metadata);
 
 	/// <summary>
+	/// デスクリプタヒープ生成関数
+	/// </summary>
+	/// <param name="heapType"></param>
+	/// <param name="numDescriptors"></param>
+	/// <param name="shaderVisible"></param>
+	/// <returns></returns>
+	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE& heapType, const UINT& numDescriptors, bool shaderVisible);
+
+	/// <summary>
 	/// テクスチャデータの転送
 	/// </summary>
 	/// <param name="texture"></param>
@@ -204,15 +213,6 @@ private:
 	/// </summary>
 	/// <param name="result"></param>
 	void InitializeDescriptorHeap();
-
-	/// <summary>
-	/// デスクリプタヒープ生成関数
-	/// </summary>
-	/// <param name="heapType"></param>
-	/// <param name="numDescriptors"></param>
-	/// <param name="shaderVisible"></param>
-	/// <returns></returns>
-	ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE& heapType, const UINT& numDescriptors, bool shaderVisible);
 
 	/// <summary>
 	/// レンダーターゲットビューの生成

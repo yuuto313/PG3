@@ -15,9 +15,10 @@ TextureManager* TextureManager::GetInstance()
 	return instance;
 }
 
-void TextureManager::Initialize(DirectXCommon* dxCommon)
+void TextureManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager)
 {
 	dxCommon_ = dxCommon;
+	pSrvManager_ = srvManager;
 
 	// SRV1の数と同数
 	textureDatas_.reserve(DirectXCommon::kMaxSRVCount);
@@ -35,19 +36,12 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	// 読み込み済みテクスチャを検索
 	//-------------------------------------
 
-	auto it = std::find_if(
-		textureDatas_.begin(),
-		textureDatas_.end(),
-		[&](TextureData& textureData) {return textureData.filePath == filePath; }
-	);
-
-	if (it != textureDatas_.end()) {
-		// 読み込み済みなら早期return
+	if (textureDatas_.contains(filePath)) {
 		return;
 	}
 
 	// テクスチャ枚数上限チェック
-	assert(textureDatas_.size() + kSRVIndexTop < DirectXCommon::kMaxSRVCount);
+	assert(pSrvManager_->CheckAllocate());
 
 	//-------------------------------------
 	// テクスチャファイルを読んでプログラムで扱えるようにする
@@ -70,16 +64,13 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	// テクスチャデータ追加
 	//-------------------------------------
 	
-	// テクスチャデータを追加
-	textureDatas_.resize(textureDatas_.size() + 1);
-	// 追加したテクスチャデータの参照を取得する
-	TextureData& textureData = textureDatas_.back();
+	// テクスチャデータを追加して書き込む
+	TextureData& textureData = textureDatas_[filePath];
 
 	//-------------------------------------
 	// テクスチャデータ書き込み
 	//-------------------------------------
 
-	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
 	dxCommon_->UploadTextureData(textureData.resource, mipImages);
@@ -90,8 +81,6 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 	// テクスチャデータの要素番号をSRVのインデックスとする
 	uint32_t srvIndex = static_cast<uint32_t>(textureDatas_.size() - 1) + kSRVIndexTop;
-
-	
 
 	//-------------------------------------
 	// SRVの設定を行う
@@ -105,8 +94,9 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 	// SRVを作成するDescriptorHeapの場所を決める
 	// 先頭はImGuiが使っているのでその次を使う
-	textureData.srvHandleCPU = dxCommon_->GetSRVCPUDescriptorHandle(srvIndex);
-	textureData.srvHandleGPU = dxCommon_->GetSRVGPUDescriptorHandel(srvIndex);
+	textureData.srvIndex = pSrvManager_->Allocate();
+	textureData.srvHandleCPU = pSrvManager_->GetCPUDescriptorHandle(textureData.srvIndex);
+	textureData.srvHandleGPU = pSrvManager_->GetGPUDescriptorHandle(textureData.srvIndex);
 
 	//-------------------------------------
 	// 設定を基にSRVの生成
@@ -118,6 +108,10 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 {
+	if (textureDatas_.contains(filePath)) {
+		return;
+	}
+
 	// 読み込み済みテクスチャデータ検索
 	auto it = std::find_if(
 		textureDatas_.begin(),

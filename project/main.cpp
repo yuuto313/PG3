@@ -9,6 +9,7 @@
 #include "Object3d.h"
 #include "ModelManager.h"
 #include "Camera.h"
+#include "SrvManager.h"
 
 #include "Audio.h"
 
@@ -90,6 +91,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Object3dCommon* pObject3dCommon = nullptr;
 	std::vector<Object3d*> pObjects3d;
 	Camera* pCamera = nullptr;
+	SrvManager* pSrvManager = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -121,10 +123,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pDxCommon->Initialize(pWinApp);
 
 	//-------------------------------------
+	// SRVマネージャの初期化
+	//-------------------------------------
+
+	pSrvManager = new SrvManager();
+	pSrvManager->Initialize(pDxCommon);
+
+	//-------------------------------------
+	// 3dモデルマネージャの初期化
+	//-------------------------------------
+
+	ModelManager::GetInstance()->Initialize(pDxCommon);
+	// .objファイルからモデルを読み込む
+	ModelManager::GetInstance()->LoadModel("plane.obj");
+	ModelManager::GetInstance()->LoadModel("axis.obj");
+
+	//-------------------------------------
 	// テクスチャマネージャの初期化
 	//-------------------------------------
 
-	TextureManager::GetInstance()->Initialize(pDxCommon);
+	TextureManager::GetInstance()->Initialize(pDxCommon,pSrvManager);
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
 	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
 	
@@ -184,15 +202,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	pObject3dCommon = new Object3dCommon();
 	pObject3dCommon->Initialize(pDxCommon);
-
-	//-------------------------------------
-	// 3dモデルマネージャの初期化
-	//-------------------------------------
-
-	ModelManager::GetInstance()->Initialize(pDxCommon);
-	// .objファイルからモデルを読み込む
-	ModelManager::GetInstance()->LoadModel("plane.obj");
-	ModelManager::GetInstance()->LoadModel("axis.obj");
 
 	//-------------------------------------
 	// 3dオブジェクトの初期化
@@ -399,6 +408,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
+	delete pSrvManager;
+	delete pCamera;
 	for (uint32_t i = 0; i < 2; i++) {
 		delete pObjects3d[i];
 	}
