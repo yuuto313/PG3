@@ -1,7 +1,7 @@
 #pragma once
-#include "Animal.h"
+#include "IAnimal.h"
 
-class Dog : public Animal
+class Dog : public IAnimal
 {
 public:
 

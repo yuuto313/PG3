@@ -1,16 +1,16 @@
-#include "Animal.h"
+#include "IAnimal.h"
 
-Animal::Animal()
+IAnimal::IAnimal()
 {
 	std::cout << "生成" << std::endl;
 }
 
-Animal::~Animal()
+IAnimal::~IAnimal()
 {
 	std::cout << "破棄" << std::endl;
 }
 
-void Animal::MakeSound()
+void IAnimal::MakeSound()
 {
 	std::cout << "動物の鳴き声" << std::endl;
 }

@@ -9,7 +9,7 @@
 
 int main(int argc,char* argv[]) {	
 
-	std::vector<std::unique_ptr<Animal>> animals;
+	std::vector<std::unique_ptr<IAnimal>> animals;
 
 	animals.push_back(std::make_unique<Dog>());
 	animals.push_back(std::make_unique<Cat>());
