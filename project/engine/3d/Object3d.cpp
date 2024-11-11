@@ -16,7 +16,12 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	//-------------------------------------
 
 	transform_ = { {1.0f,1.0f,1.f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
-	cameraTransform_ = { {1.0f,1.0f,1.0f},{0.3f,0.0f,0.0f},{0.0f,4.0f,-10.0f} };
+
+	//-------------------------------------
+	// デフォルトカメラをセットする
+	//-------------------------------------
+
+	this->pCamera_ = pObject3dCommon_->GetDefaultCamera();
 
 	//-------------------------------------
 	// 座標変換行列データ作成
@@ -125,25 +130,16 @@ void Object3d::CreateWVPMatrix()
 	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	//-------------------------------------
-	// cameraTransformからcameraMatrixを作る
-	//-------------------------------------
-	
-	Matrix4x4 cameraMatrix = MyMath::MakeAffineMatrix(cameraTransform_.scale, cameraTransform_.rotate, cameraTransform_.translate);
-	
-	//-------------------------------------
-	// cameraMatrixからviewMatrixを作る
+	// worldViewProjectionMatrixを作成
 	//-------------------------------------
 
-	Matrix4x4 viewMatrix = MyMath::Inverse(cameraMatrix);
+	if (pCamera_) {
+		const Matrix4x4& viewProjectionMatrix = pCamera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrix_ = MyMath::Multiply(worldMatrix, viewProjectionMatrix);
+	} else {
+		worldViewProjectionMatrix_ = worldMatrix;
+	}
 
-	//-------------------------------------
-	// projectionMarixを作って透視投影行列を書き込む
-	//-------------------------------------
-
-	Matrix4x4 projectionMatrix = MyMath::MakePerspectiveFovMatrix(0.45f, float(WinApp::kClientWidth) / float(WinApp::kClientHeight), 0.1f, 100.f);
-
-	Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
-
-	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	transformationMatrixData_->WVP = worldViewProjectionMatrix_;
 	transformationMatrixData_->World = worldMatrix;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "DirectXCommon.h"
+#include "Camera.h"
 
 /// <summary>
 /// 3Dオブジェクト共通部
@@ -29,10 +30,15 @@ public:
 	//-------------ゲッター・セッター-------------//
 
 	DirectXCommon* GetDxCommon()const { return dxCommon_; }
+	Camera* GetDefaultCamera()const { return pDefaultCamera_; }
+
+	void SetDefaultCamera(Camera* camera) { this->pDefaultCamera_ = camera; }
 
 private:
 
 	//-------------メンバ変数-------------//
+
+	Camera* pDefaultCamera_ = nullptr;
 
 	DirectXCommon* dxCommon_;
 

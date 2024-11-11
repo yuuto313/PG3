@@ -8,6 +8,7 @@
 #include "Object3dCommon.h"
 #include "Object3d.h"
 #include "ModelManager.h"
+#include "Camera.h"
 
 #include "Audio.h"
 
@@ -88,6 +89,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	std::vector<Sprite*> pSprites;
 	Object3dCommon* pObject3dCommon = nullptr;
 	std::vector<Object3d*> pObjects3d;
+	Camera* pCamera = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -201,6 +203,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		pObjects3d.push_back(pObject3d);
 	}
 
+	//-------------------------------------
+	// カメラの初期化
+	//-------------------------------------
+
+	pCamera = new Camera();
+	pCamera->SetRotate()
 
 #pragma endregion 基盤システムの初期化
 

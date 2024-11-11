@@ -4,6 +4,7 @@
 
 #include "Model.h"
 #include "ModelManager.h"
+#include "Camera.h"
 
 #include <d3d12.h>
 #include <wrl.h>
@@ -49,6 +50,7 @@ public:// ゲッター・セッター
 	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+	void SetCamera(Camera* camera) { this->pCamera_ = camera; }
 
 	/// <summary>
 	/// モデル検索してセットする
@@ -60,10 +62,11 @@ private:// メンバ変数
 
 	Object3dCommon* pObject3dCommon_ = nullptr;
 	Model* pModel_ = nullptr;
+	Camera* pCamera_ = nullptr;
 
 	// Transform
 	Transform transform_;
-	Transform cameraTransform_;
+	Matrix4x4 worldViewProjectionMatrix_;
 
 	// バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
