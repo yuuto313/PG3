@@ -3,12 +3,26 @@
 
 #define PI 3.141592
 
+Circle::Circle()
+{
+}
+
+Circle::~Circle()
+{
+}
+
+void Circle::Info()
+{
+	std::cout << "円の半径 = " << radius_ << std::endl;
+}
+
 void Circle::Size()
 {
-	area_ = PI * (radius_ * radius_);
+	// 円の面積を求める
+	area_ = static_cast<float>(PI) * (radius_ * radius_);
 }
 
 void Circle::Draw()
 {
-	std::cout << "円の面積は%fです" << std::endl;
+	std::cout << "円の面積 = "<< area_ << std::endl;
 }

@@ -1,12 +1,12 @@
 #pragma once
 #include "IShape.h"
 
-class Circle : public IShape
+class Rect : public IShape
 {
 public:
 
-	Circle();
-	~Circle();
+	Rect();
+	~Rect();
 
 	void Info() override;
 
@@ -16,8 +16,8 @@ public:
 
 private:
 
-	float radius_ = 3.0f;
-
+	float width_ = 5.0f;
+	float height_ = 3.0f;
 
 };
 
