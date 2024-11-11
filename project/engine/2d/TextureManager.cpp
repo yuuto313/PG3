@@ -41,7 +41,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	}
 
 	// テクスチャ枚数上限チェック
-	assert(pSrvManager_->CheckAllocate());
+	assert(pSrvManager_->CheckAllocate(textureDatas_.size());
 
 	//-------------------------------------
 	// テクスチャファイルを読んでプログラムで扱えるようにする

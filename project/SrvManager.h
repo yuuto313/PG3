@@ -23,7 +23,7 @@ public:
 	/// 確保可能チェック
 	/// </summary>
 	/// <returns></returns>
-	bool CheckAllocate();
+	bool CheckAllocate(size_t size);
 
 	/// <summary>
 	/// 描画前処理

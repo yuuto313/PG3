@@ -32,9 +32,16 @@ uint32_t SrvManager::Allocate()
 
 }
 
-bool SrvManager::CheckAllocate()
+bool SrvManager::CheckAllocate(size_t size)
 {
-	return false;
+	if (size + 1 < kMaxCount_) {
+		// 上限に達していない
+		return false;
+	}
+	else {
+		// 達している
+		return true;
+	}
 }
 
 void SrvManager::PreDraw()
