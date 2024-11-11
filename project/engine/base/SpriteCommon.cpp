@@ -17,6 +17,7 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 
 void SpriteCommon::ImGui()
 {
+#ifdef _DEBUG
 	ImGui::Begin("BlendDesc");
 	const char* items[] = { "None","Normal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen" };
 	static int item_current = static_cast<int>(blendMode_);
@@ -24,6 +25,7 @@ void SpriteCommon::ImGui()
 		blendMode_ = static_cast<BlendMode>(item_current);
 	}
 	ImGui::End();
+#endif //_DEBUG
 
 	//-------------------------------------
 	// ブレンドモードが変更された場合、パイプラインステートを再作成
@@ -35,6 +37,7 @@ void SpriteCommon::ImGui()
 		graphicsPipelineState_ = CreateGraphicsPipelineState(dxCommon_->GetDevice(), graphicsPipelineStateDesc_);
 		previousBlendMode = blendMode_;
 	}
+
 }
 
 

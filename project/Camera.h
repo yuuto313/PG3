@@ -14,6 +14,11 @@ public:
 	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// ImGuiで値を調整
+	/// </summary>
+	void ImGui();
+
 	const Matrix4x4& GetWorldMatrix()const { return worldMatrix_; }
 	const Matrix4x4& GetViewMatrix()const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix()const { return projectionMatrix_; }

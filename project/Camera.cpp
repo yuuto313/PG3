@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "WinApp.h"
+#include "ImGuiManager.h"
 
 Camera::Camera()
 	: transform_({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} })
@@ -28,4 +29,14 @@ void Camera::Update()
 	// 合成行列
 	viewProjectionMatrix_ = MyMath::Multiply(viewMatrix_, projectionMatrix_);
 
+}
+
+void Camera::ImGui()
+{
+#ifdef _DEBUG
+	ImGui::Begin("Camera");
+	ImGui::DragFloat3("translate", &transform_.translate.x, 0.1f);
+	ImGui::DragFloat3("rotate", &transform_.rotate.x, 0.05f);
+	ImGui::End();
+#endif //_DEBUG
 }

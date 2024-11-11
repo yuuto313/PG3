@@ -171,6 +171,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	//-------------------------------------
+	// カメラの初期化
+	//-------------------------------------
+
+	pCamera = new Camera();
+	pCamera->SetRotate({ 0.3f,0.0f,0.0f });
+	pCamera->SetTranslate({ 0.0f,4.0f,-10.0f });
+
+	//-------------------------------------
 	// 3dオブジェクト共通部の初期化
 	//-------------------------------------
 
@@ -199,16 +207,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		translate = Vector3(i * 1.0f, i + 1.0f);
 		pObject3d->SetTranslate(translate);
 		pObject3d->SetModel("axis.obj");
+		pObject3d->SetCamera(pCamera);
 
 		pObjects3d.push_back(pObject3d);
 	}
-
-	//-------------------------------------
-	// カメラの初期化
-	//-------------------------------------
-
-	pCamera = new Camera();
-	pCamera->SetRotate()
 
 #pragma endregion 基盤システムの初期化
 
@@ -271,6 +273,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
 			pSprites[i]->Update();
 		}
+
+		//-------------------------------------
+		// カメラの更新
+		//-------------------------------------
+
+		// 3dオブジェクトの更新より前に行う
+		pCamera->Update();
+		pCamera->ImGui();
 
 		//-------------------------------------
 		// 3dオブジェクトの更新
