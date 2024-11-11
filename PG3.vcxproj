@@ -129,13 +129,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasePikmin.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Math.cpp" />
+    <ClCompile Include="RedPikmin.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasePikmin.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="RedPikmin.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
