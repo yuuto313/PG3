@@ -18,8 +18,10 @@
 #include "D3DResourceLeakChecker.h"
 #include "MyMath.h"
 
+#include "GameSystem.h"
+
 //-------------------------------------
-//main関数
+// main関数
 //-------------------------------------
 
 //windowsアプリでのエントリーポイント(main関数)
@@ -44,8 +46,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera* pCamera = nullptr;
 	
+	GameSystem* pGameSystem = nullptr;
 
 #pragma region 基盤システムの初期化
+
+	pGameSystem = new GameSystem();
+	pGameSystem->Initialize();
 
 	//-------------------------------------
 	// リークチェッカー
@@ -394,6 +400,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete pDxCommon;
 	delete pInput;
 	delete pWinApp;
+
+	delete pGameSystem;
 
 	return 0;
 }
