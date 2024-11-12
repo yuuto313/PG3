@@ -16,6 +16,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->pSpriteCommon_ = spriteCommon;
+	this->textureFilePath_ = textureFilePath;
 
 	//-------------------------------------
 	// Transform情報を作る
@@ -56,7 +57,7 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 	// テクスチャ番号の検索と記録
 	//-------------------------------------
 
-	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexByFilePath(textureFilePath);
+	textureIndex_ = TextureManager::GetInstance()->GetSrvIndex(textureFilePath_);
 
 	AdjustTextureSize();
 
@@ -68,7 +69,7 @@ void Sprite::Update()
 	// 頂点リソースにデータを書き込む
 	//-------------------------------------
 
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex_);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
 	// テクスチャ範囲指定
 	float tex_left = textureLeftTop_.x / metadata.width;
@@ -184,9 +185,7 @@ void Sprite::Draw()
 	// SRVのDescriptorTableの先頭を設定
 	//-------------------------------------
 
-	// SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
-	// 変数を見て利用するSRVを決める
-	pSpriteCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2,TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_));
+	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureIndex_);
 
 	//-------------------------------------
 	// 描画!(DrawCall/ドローコール)
@@ -333,7 +332,7 @@ void Sprite::CreateWVPMatrix()
 void Sprite::AdjustTextureSize()
 {
 	// テクスチャメタデータを取得
-	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureIndex_);
+	const DirectX::TexMetadata& metadata = TextureManager::GetInstance()->GetMetaData(textureFilePath_);
 
 	textureSize_.x = static_cast<float>(metadata.width);
 	textureSize_.y = static_cast<float>(metadata.height);

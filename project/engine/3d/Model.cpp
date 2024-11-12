@@ -7,7 +7,7 @@
 void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPath, const std::string& filename)
 {
 	// 引数で受け取ってメンバ変数に記録する
-	this->pModelCommon_ = modelCommon;
+	this->pModelCommon_ = modelCommon;;
 
 	//-------------------------------------
 	// モデル読み込み
@@ -35,7 +35,7 @@ void Model::Initialize(ModelCommon* modelCommon, const std::string& directoryPat
 	TextureManager::GetInstance()->LoadTexture(modelData_.material.textureFilePath);
 
 	// 読み込んだテクスチャの番号を取得
-	modelData_.material.textureIndex = TextureManager::GetInstance()->GetTextureIndexByFilePath(modelData_.material.textureFilePath);
+	modelData_.material.textureIndex = TextureManager::GetInstance()->GetSrvIndex(modelData_.material.textureFilePath);
 }
 
 void Model::Draw()
@@ -56,7 +56,7 @@ void Model::Draw()
 	// SRVのDescriptorTableの先頭を設定
 	//-------------------------------------
 
-	pModelCommon_->GetDxCommon()->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(modelData_.material.textureIndex));
+	SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(2, modelData_.material.textureIndex);
 
 	//-------------------------------------
 	// 描画！
@@ -127,9 +127,9 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 	// 1.中で必要になる変数の宣言
 	//-------------------------------------
 
-	//構築するマテリアルデータ
+	// 構築するマテリアルデータ
 	MaterialData materialData;
-	//ファイルから読んだ1行を格納するもの
+	// ファイルから読んだ1行を格納するもの
 	std::string line;
 
 	//-------------------------------------
@@ -137,7 +137,7 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 	//-------------------------------------
 
 	std::ifstream file(directoryPath + "/" + filename);
-	//とりあえず開けなかったら止める
+	// とりあえず開けなかったら止める
 	assert(file.is_open());
 
 	//-------------------------------------
@@ -148,11 +148,11 @@ MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, c
 		std::istringstream s(line);
 		s >> identifier;
 
-		//identifilerに応じた処理
+		// identifilerに応じた処理
 		if (identifier == "map_Kd") {
 			std::string textureFilename;
 			s >> textureFilename;
-			//連結してファイルパスにする
+			// 連結してファイルパスにする
 			materialData.textureFilePath = directoryPath + "/" + textureFilename;
 		}
 	}
@@ -165,40 +165,40 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 	// 1.中で必要になる変数の宣言
 	//-------------------------------------
 
-	ModelData modelData;;//構築するModelData
-	std::vector<Vector4> positions;//位置
-	std::vector<Vector3> normals;//法線
-	std::vector<Vector2> texcoords;//テクスチャの座標
-	std::string line;//ファイルから読んだ一行を格納するもの
+	ModelData modelData;;// 構築するModelData
+	std::vector<Vector4> positions;// 位置
+	std::vector<Vector3> normals;// 法線
+	std::vector<Vector2> texcoords;// テクスチャの座標
+	std::string line;// ファイルから読んだ一行を格納するもの
 
 	//-------------------------------------
 	// 2.ファイルを開く
 	//-------------------------------------
 
 	std::ifstream file(directoryPath + "/" + filename);
-	assert(file.is_open());//開けなかったら止める
+	assert(file.is_open());// 開けなかったら止める
 
 	//-------------------------------------
 	// 3.ファイルを読み、ModelDataを構築
 	//-------------------------------------
 
 	while (std::getline(file, line)) {
-		//streamから１行読んでstd::stringに格納する関数。whileでファイルの最後まで１行ずつ読み込んでいく
+		// streamから１行読んでstd::stringに格納する関数。whileでファイルの最後まで１行ずつ読み込んでいく
 		std::string identifier;
-		//文字列を分析しながら読むためのクラス、空白を区切り文字として読んでいくことができる
+		// 文字列を分析しながら読むためのクラス、空白を区切り文字として読んでいくことができる
 		std::istringstream s(line);
-		//先頭の識別子を読む
+		// 先頭の識別子を読む
 		s >> identifier;
 
-		//identifierに応じた処理
-		//"v":頂点位置
-		//"vt":頂点テクスチャ座標
-		//"vn":頂点法線
-		//"f":面
+		// identifierに応じた処理
+		// "v":頂点位置
+		// "vt":頂点テクスチャ座標
+		// "vn":頂点法線
+		// "f":面
 		if (identifier == "v") {
 			Vector4 position;
 			s >> position.x >> position.y >> position.z;
-			//position.x *= -1.0f;
+			// position.x *= -1.0f;
 			position.w = 1.0f;
 			positions.push_back(position);
 		} else if (identifier == "vt") {
@@ -208,45 +208,45 @@ ModelData Model::LoadObjFile(const std::string& directoryPath, const std::string
 		} else if (identifier == "vn") {
 			Vector3 normal;
 			s >> normal.x >> normal.y >> normal.z;
-			//normal.x *= -1.0f;
+			// normal.x *= -1.0f;
 			normals.push_back(normal);
 		} else if (identifier == "f") {
-			//三角形を作る
+			// 三角形を作る
 			VertexData triangle[3];
-			//面は三角形限定。その他は未対応
+			// 面は三角形限定。その他は未対応
 			for (int32_t faceVertex = 0; faceVertex < 3; ++faceVertex) {
 				std::string vertexDefinition;
 				s >> vertexDefinition;
-				//頂点の要素へのIndexは「位置/UV/法線」で格納されてるので、　分解してIndexを取得する
+				// 頂点の要素へのIndexは「位置/UV/法線」で格納されてるので、　分解してIndexを取得する
 				std::istringstream v(vertexDefinition);
 				uint32_t elementIndices[3];
 				for (int32_t element = 0; element < 3; ++element) {
 					std::string index;
-					//区切りでインデックスを読んでいく
+					// 区切りでインデックスを読んでいく
 					std::getline(v, index, '/');
 					elementIndices[element] = std::stoi(index);
 				}
-				//要素へのIndexから、実際の要素の値を取得して、頂点を構築する
+				// 要素へのIndexから、実際の要素の値を取得して、頂点を構築する
 				Vector4 position = positions[elementIndices[0] - 1];
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
-				//右手系から左手系へ変換するためｘを反転させる
-				//position.x *= -1.0f;
-				//normal.x *= -1.0f;
+				// 右手系から左手系へ変換するためｘを反転させる
+				// position.x *= -1.0f;
+				// normal.x *= -1.0f;
 				texcoord.y = 1.0f - texcoord.y;
-				//VertexData vertex = { position,texcoord,normal };
-				//modelData.verteces.push_back(vertex);
+				// VertexData vertex = { position,texcoord,normal };
+				// modelData.verteces.push_back(vertex);
 				triangle[faceVertex] = { position,texcoord,normal };
 			}
-			//頂点を逆順で登録することで、回り順を逆にする
+			// 頂点を逆順で登録することで、回り順を逆にする
 			modelData.vertices.push_back(triangle[2]);
 			modelData.vertices.push_back(triangle[1]);
 			modelData.vertices.push_back(triangle[0]);
 		} else if (identifier == "mtllib") {
-			//materialTemplateLibraryファイル名を取得する
+			// materialTemplateLibraryファイル名を取得する
 			std::string materialFilename;
 			s >> materialFilename;
-			//基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
+			// 基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
 			modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
 		}
 	}

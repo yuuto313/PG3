@@ -3,6 +3,7 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include "DirectXCommon.h"
+#include "SrvManager.h"
 
 class SpriteCommon;
 
@@ -104,6 +105,9 @@ private:
 
 	// テクスチャ切り出しサイズ
 	Vector2 textureSize_ = { 100.f,100.0f };
+
+	// テクスチャパス
+	std::string textureFilePath_;
 
 	// テクスチャ番号
 	uint32_t textureIndex_ = 0;

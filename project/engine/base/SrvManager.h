@@ -6,12 +6,47 @@
 /// </summary>
 class SrvManager
 {
+private:// シングルトン設計
+	static SrvManager* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	SrvManager() = default;
+	~SrvManager() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	SrvManager(SrvManager&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	SrvManager& operator=(SrvManager&) = delete;
+
 public:
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static SrvManager* GetInstance();
+
+	// 最大SRV数（最大テクスチャ枚数）
+	static const uint32_t kMaxCount;
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Initialize(DirectXCommon* dxCommon);
+
+	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
 
 	/// <summary>
 	/// 確保
@@ -23,12 +58,18 @@ public:
 	/// 確保可能チェック
 	/// </summary>
 	/// <returns></returns>
-	bool CheckAllocate(size_t size);
+	bool CheckAllocate();
 
 	/// <summary>
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();
+
+	/// <summary>
+	/// SRVを取得
+	/// </summary>
+	/// <returns></returns>
+	ID3D12DescriptorHeap* GetSrvDescriptorHeap()const { return descriptorHeap_.Get(); }
 
 	/// <summary>
 	/// SRV生成（テクスチャ用）
@@ -48,8 +89,18 @@ public:
 	/// <param name="structureByteStride"></param>
 	void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 
+	/// <summary>
+	/// 指定番号のCPUディスクリプタハンドルを取得
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 
+	/// <summary>
+	/// 指定番号のGPUディスクリプタハンドルを取得
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
 
 	/// <summary>
@@ -62,8 +113,6 @@ public:
 private:
 	DirectXCommon* pDxCommon_ = nullptr;
 
-	// 最大SRV数（最大テクスチャ枚数）
-	static const uint32_t kMaxCount_;
 	// SRV用のデスクリプタサイズ
 	uint32_t desctiptorSize_;
 	// SRV用デスクリプタヒープ

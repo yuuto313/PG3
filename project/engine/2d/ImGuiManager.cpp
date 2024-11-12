@@ -12,7 +12,7 @@ void ImGuiManager::Initialize(DirectXCommon* dxCommon,WinApp* winApp)
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(winApp_->GetHwnd());
-	ImGui_ImplDX12_Init(dxCommon_->GetDevice(), dxCommon_->GetSwapChainDesc().BufferCount, dxCommon_->GetRTVDesc().Format, dxCommon_->GetSrvDescriptorHeap(), dxCommon_->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), dxCommon_->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+	ImGui_ImplDX12_Init(dxCommon_->GetDevice(), dxCommon_->GetSwapChainDesc().BufferCount, dxCommon_->GetRTVDesc().Format, SrvManager::GetInstance()->GetSrvDescriptorHeap(), SrvManager::GetInstance()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), SrvManager::GetInstance()->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 #endif //  _DEBUG
 }
 

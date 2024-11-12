@@ -23,9 +23,6 @@ public:
 	//namespace省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-	// 最大SRV数(最大テクスチャ枚数)
-	static const uint32_t kMaxSRVCount;
-
 	//-------------基本処理-------------//
 
 	DirectXCommon();
@@ -94,14 +91,6 @@ public:
 	ID3D12Device* GetDevice() const { return device_.Get(); }
 
 	/// <summary>
-	/// SRVを取得
-	/// </summary>
-	/// <returns></returns>
-	ID3D12DescriptorHeap* GetSrvDescriptorHeap()const { return srvDescriptorHeap_.Get(); }
-
-	uint32_t GetDescriptorSizeSRV()const { return descriptorSizeSRV_; }
-
-	/// <summary>
 	/// コマンドリストの取得
 	/// </summary>
 	/// <returns></returns>
@@ -119,20 +108,6 @@ public:
 	/// <returns></returns>
 	D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() { return rtvDesc_; }
 
-	/// <summary>
-	/// SRVの指定番号のCPUデスクリプタハンドルを取得する
-	/// </summary>
-	/// <param name="index"></param>
-	/// <returns></returns>
-	D3D12_CPU_DESCRIPTOR_HANDLE GetSRVCPUDescriptorHandle(uint32_t index);
-
-	/// <summary>
-	/// SRVの指定番号のGPUデスクリプタハンドルを取得する
-	/// </summary>
-	/// <param name="index"></param>
-	/// <returns></returns>
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSRVGPUDescriptorHandel(uint32_t index);
-
 private: 
 	//-------------メンバ変数-------------//
 	
@@ -149,7 +124,6 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 	std::array<Microsoft::WRL::ComPtr<ID3D12Resource>, 2> swapChainResources_ = {};
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_ = {};
@@ -167,10 +141,8 @@ private:
 	IDxcCompiler3* dxcCompiler_ = {};
 	IDxcIncludeHandler* includeHandler_ = {};
 
-	uint32_t descriptorSizeSRV_ = {};
 	uint32_t descriptorSizeRTV_ = {};
 	uint32_t descriptorSizeDSV_ = {};
-
 	
 	// 記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_ = {};

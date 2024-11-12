@@ -2,6 +2,7 @@
 #include "ModelCommon.h"
 #include "VertexData.h"
 #include "Material.h"
+#include "SrvManager.h"
 
 #include <vector>
 

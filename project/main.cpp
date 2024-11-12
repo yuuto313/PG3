@@ -19,60 +19,6 @@
 #include "MyMath.h"
 
 //-------------------------------------
-//DepthStencilTextureを作る
-//-------------------------------------
-
-Microsoft::WRL::ComPtr<ID3D12Resource> CreateDepthStencilTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const int32_t width,const uint32_t height) {
-	D3D12_RESOURCE_DESC resourceDesc{};
-	resourceDesc.Width = width;//Textureの幅
-	resourceDesc.Height = height;//Textureの高さ
-	resourceDesc.MipLevels = 1;//mipmapの数
-	resourceDesc.DepthOrArraySize = 1;//奥行きor配列Textureの配列数
-	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//DepthStencilとして利用可能なフォーマット
-	resourceDesc.SampleDesc.Count = 1;//サンプリングカウント。1固定。
-	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;//２次元
-	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//DepthStencilとして使う通知
-	
-	//利用するHeapの設定
-	D3D12_HEAP_PROPERTIES heapProperties{};
-	heapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//VRAM上に作る
-
-	D3D12_CLEAR_VALUE depthClearValue{};
-	depthClearValue.DepthStencil.Depth = 1.0f;//1.0f(最大値)でクリア
-	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット。Resourceと合わせる
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
-	HRESULT hr = device->CreateCommittedResource(
-		&heapProperties,//Heapの設定
-		D3D12_HEAP_FLAG_NONE,//Heapの特殊な設定。特になし
-		&resourceDesc, //Resourceの設定
-		D3D12_RESOURCE_STATE_DEPTH_WRITE,//深度値を書き込む状態にしておく
-		&depthClearValue, //Clear最適値
-		IID_PPV_ARGS(&resource)//作成するResourceポインタへのポインタ
-		);
-	assert(SUCCEEDED(hr));
-
-	return resource;
-}
-
-//-------------------------------------
-//特定のインデックスのDescriptorHandleを取得する
-//-------------------------------------
-//CPUver.
-D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,const uint32_t descriptorSize,const uint32_t index) {
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (descriptorSize * index);
-	return handleCPU;
-}
-
-//GPUver.
-D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap,const uint32_t descriptorSize,const uint32_t index) {
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (descriptorSize * index);
-	return handleGPU;
-}
-
-//-------------------------------------
 //main関数
 //-------------------------------------
 
@@ -82,16 +28,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ポインタ
 	D3DResourceLeakChecker* pLeakChecke = nullptr;
 	WinApp* pWinApp = nullptr;
-	Input* pInput = nullptr;
+	
 	DirectXCommon* pDxCommon = nullptr;
+
 	Audio* pAudio = nullptr;
+	Input* pInput = nullptr;
+
 	ImGuiManager* pImguiManager = nullptr;
+
 	SpriteCommon* pSpriteCommon = nullptr;	
 	std::vector<Sprite*> pSprites;
+
 	Object3dCommon* pObject3dCommon = nullptr;
 	std::vector<Object3d*> pObjects3d;
+
 	Camera* pCamera = nullptr;
-	SrvManager* pSrvManager = nullptr;
+	
 
 #pragma region 基盤システムの初期化
 
@@ -126,8 +78,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// SRVマネージャの初期化
 	//-------------------------------------
 
-	pSrvManager = new SrvManager();
-	pSrvManager->Initialize(pDxCommon);
+	SrvManager::GetInstance()->Initialize(pDxCommon);
+
+	//-------------------------------------
+	// テクスチャマネージャの初期化
+	//-------------------------------------
+
+	TextureManager::GetInstance()->Initialize(pDxCommon);
+	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
+	TextureManager::GetInstance()->LoadTexture("resource/eto_tora_family.png");
 
 	//-------------------------------------
 	// 3dモデルマネージャの初期化
@@ -137,14 +97,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// .objファイルからモデルを読み込む
 	ModelManager::GetInstance()->LoadModel("plane.obj");
 	ModelManager::GetInstance()->LoadModel("axis.obj");
-
-	//-------------------------------------
-	// テクスチャマネージャの初期化
-	//-------------------------------------
-
-	TextureManager::GetInstance()->Initialize(pDxCommon,pSrvManager);
-	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
-	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
 	
 	//-------------------------------------
 	// Audioの初期化
@@ -171,19 +123,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライトの初期化
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < 1; ++i) {
+	for (uint32_t i = 0; i < 3; ++i) {
 		Sprite* pSprite = new Sprite();
 		// スプライトごとに異なるテクスチャを割り当てる
 		std::string texturePath;
 		if (i == 0) {
 			texturePath = "resource/uvChecker.png";
 		} else if (i == 1) {
-			texturePath = "resource/uvChecker.png";
+			texturePath = "resource/eto_tora_family.png";
 		} else {
 			texturePath = "resource/monsterBall.png";
 		}
 
 		pSprite->Initialize(pSpriteCommon, texturePath);
+
+		Vector2 position = pSprite->GetPosition();
+		position = Vector2(i * 300.0f, i + 50.0f);
+		pSprite->SetPosition(position);
 
 		pSprites.push_back(pSprite);
 	}
@@ -281,6 +237,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		for (uint32_t i = 0; i < pSprites.size(); ++i) {
 			pSprites[i]->Update();
+
+			pSprites[i]->SetSize({600.0f,300.0f});
+
+			float rotation = pSprites[i]->GetRotation();
+			rotation += 0.01f;
+			pSprites[i]->SetRotation(rotation);
+
 		}
 
 		//-------------------------------------
@@ -317,6 +280,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
 		pDxCommon->PreDraw();
+
+		// DescriptorHeapを設定
+		SrvManager::GetInstance()->PreDraw();
 
 		//-------------------------------------
 		// スプライト描画準備
@@ -386,6 +352,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	TextureManager::GetInstance()->Finalize();
 
+	//-------------------------------------
+	// SRVマネージャの終了処理
+	//-------------------------------------
+
+	SrvManager::GetInstance()->Finalize();
+
     //-------------------------------------
 	// ImGuiの終了処理
 	//-------------------------------------
@@ -408,7 +380,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
-	delete pSrvManager;
 	delete pCamera;
 	for (uint32_t i = 0; i < 2; i++) {
 		delete pObjects3d[i];

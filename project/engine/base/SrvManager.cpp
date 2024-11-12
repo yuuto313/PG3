@@ -1,25 +1,44 @@
 #include "SrvManager.h"
 #include <cassert>
 
-const uint32_t SrvManager::kMaxCount_ = 512;
+const uint32_t SrvManager::kMaxCount = 512;
+
+SrvManager* SrvManager::instance = nullptr;
+
+SrvManager* SrvManager::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new SrvManager;
+	}
+
+	return instance;
+}
 
 void SrvManager::Initialize(DirectXCommon* dxCommon)
 {
 	// 引数で受け取ってメンバ変数に記録する
 	this->pDxCommon_ = dxCommon;
-
+	
 	// デスクリプタヒープの生成
-	descriptorHeap_ = pDxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxCount_, true);
+	descriptorHeap_ = pDxCommon_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxCount, true);
 
 	// デスクリプタ1個分のサイズを取得して記録
 	desctiptorSize_ = pDxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
+	useIndex = 1;
+
+}
+
+void SrvManager::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 uint32_t SrvManager::Allocate()
 {
 	// 上限に達しているかチェックしてassert
-	assert(useIndex < kMaxCount_);
+	assert(useIndex < kMaxCount);
 
 	// returnする番号を一旦記録しておく
 	int index = useIndex;
@@ -32,15 +51,14 @@ uint32_t SrvManager::Allocate()
 
 }
 
-bool SrvManager::CheckAllocate(size_t size)
+bool SrvManager::CheckAllocate()
 {
-	if (size + 1 < kMaxCount_) {
+	if (useIndex < kMaxCount) {
 		// 上限に達していない
-		return false;
-	}
-	else {
-		// 達している
 		return true;
+	} else {
+		// 達している
+		return false;
 	}
 }
 

@@ -65,8 +65,8 @@ private:// メンバ変数
 	Camera* pCamera_ = nullptr;
 
 	// Transform
-	Transform transform_;
-	Matrix4x4 worldViewProjectionMatrix_;
+	Transform transform_ = {};
+	Matrix4x4 worldViewProjectionMatrix_ = {};
 
 	// バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;

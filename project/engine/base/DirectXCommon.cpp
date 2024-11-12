@@ -11,9 +11,6 @@
 #pragma comment(lib,"dxcompiler.lib")
 
 using namespace Microsoft::WRL;
-	
-// 最大SRV数
-const uint32_t DirectXCommon::kMaxSRVCount = 512;
 
 DirectXCommon::DirectXCommon()
 {
@@ -156,7 +153,6 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXCommon::CreateTextureResource(cons
 		D3D12_HEAP_FLAG_NONE,// Heapの特殊な設定、特になし
 		&resourceDesc,// Resourceの設定。初回のResourceState
 		D3D12_RESOURCE_STATE_GENERIC_READ,// Textureは基本読むだけ
-		//D3D12_RESOURCE_STATE_COPY_DEST,// データ転送される設定
 		nullptr,// Clear最適化、使わないのでnullptr
 		IID_PPV_ARGS(&resource)// 作成するResourceポインタへのポインタ
 	);
@@ -278,13 +274,6 @@ void DirectXCommon::PreDraw()
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	//--------------------------------
-	// SRV用のデスクリプタヒープを指定する
-	//--------------------------------
-
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeaps[] = { srvDescriptorHeap_.Get() };
-	commandList_->SetDescriptorHeaps(1, descriptorHeaps->GetAddressOf());
-
-	//--------------------------------
 	// ビューポート領域の設定
 	//--------------------------------
 
@@ -328,7 +317,7 @@ void DirectXCommon::PostDraw()
 	// GPUコマンドの実行
 	//--------------------------------
 
-	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_};
+	Microsoft::WRL::ComPtr<ID3D12CommandList> commandLists[] = { commandList_ };
 	// この関数を呼ぶまではGPUへの命令をたくさん貯めただけであって、GPUはまだ何もしない
 	commandQueue_->ExecuteCommandLists(1, commandLists->GetAddressOf());
 
@@ -349,7 +338,7 @@ void DirectXCommon::PostDraw()
 	//--------------------------------
 	// コマンドキューにシグナルを送る
 	//--------------------------------
-	
+
 	// GPUがここまでたどり着いたときに、Fenceの値を指定した値に記入するようにSignalを送る
 	commandQueue_->Signal(fence_.Get(), fenceVal_);
 
@@ -382,16 +371,6 @@ void DirectXCommon::PostDraw()
 	hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
 	assert(SUCCEEDED(hr));
 
-}
-
-D3D12_CPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVCPUDescriptorHandle(uint32_t index)
-{
-	return GetCPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV_, index);
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE DirectXCommon::GetSRVGPUDescriptorHandel(uint32_t index)
-{
-	return GetGPUDescriptorHandle(srvDescriptorHeap_, descriptorSizeSRV_, index);
 }
 
 void DirectXCommon::InitializeDXGIDevice()
@@ -575,7 +554,6 @@ void DirectXCommon::InitializeDescriptorHeap()
 	//-------------------------------------
 	// DescriptorSizeを取得しておく
 	//-------------------------------------
-	descriptorSizeSRV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	descriptorSizeRTV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	descriptorSizeDSV_ = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
@@ -585,13 +563,6 @@ void DirectXCommon::InitializeDescriptorHeap()
 
 	// RTV用のヒープでデスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはFalse
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
-
-	//-------------------------------------
-	// SRV用のデスクリプタヒープの生成
-	//-------------------------------------
-
-	// SRV用のヒープでデスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはTrue
-	srvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
 
 	//-------------------------------------
 	// DSV用のデスクリプタヒープの生成

@@ -67,7 +67,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(DirectXCommon* dxCommon, SrvManager* srvManager);
+	void Initialize(DirectXCommon* dxCommon);
 
 	/// <summary>
 	/// 終了
@@ -82,31 +82,30 @@ public:
 	void LoadTexture(const std::string& filePath);
 
 	/// <summary>
-	/// SRVインデックスの開始番号を取得
-	/// </summary>
-	/// <param name="filepath"></param>
-	/// <returns></returns>
-	uint32_t GetTextureIndexByFilePath(const std::string& filePath);
-
-	/// <summary>
 	/// テクスチャ番号からGPUハンドルを取得
 	/// </summary>
 	/// <param name="textureIndex"></param>
 	/// <returns></returns>
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(uint32_t textureIndex);
+	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath);
 
 	/// <summary>
 	/// メタデータを取得
 	/// </summary>
 	/// <param name="textureIndex"></param>
 	/// <returns></returns>
-	const DirectX::TexMetadata& GetMetaData(uint32_t textureIndex);
+	const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
+
+	/// <summary>
+	/// SRVインデックスの取得
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <returns></returns>
+	uint32_t GetSrvIndex(const std::string& filePath);
 
 private:
 	// テクスチャデータ
 	std::unordered_map<std::string,TextureData> textureDatas_;
 
 	DirectXCommon* dxCommon_ = nullptr;
-	SrvManager* pSrvManager_ = nullptr;
 };
 

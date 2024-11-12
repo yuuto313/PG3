@@ -7,6 +7,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 #include "DirectXCommon.h"
 #include "WinApp.h"
+#include "SrvManager.h"
 
 /// <summary>
 /// ImGuiを管理するクラス(仮実装。9章で変更予定)
@@ -21,7 +22,7 @@ public:
 	/// </summary>
 	/// <param name="dxCommon"></param>
 	/// <param name="winApp"></param>
-	void Initialize(DirectXCommon* dxCommon,WinApp* winApp);
+	void Initialize(DirectXCommon* dxCommon, WinApp* winApp);
 
 	/// <summary>
 	/// フレームが始まる旨を告げる
