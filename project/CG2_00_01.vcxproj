@@ -116,6 +116,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\input\Input.cpp" />
     <ClCompile Include="engine\io\Logger.cpp" />
     <ClCompile Include="application\base\GameSystem.cpp" />
+    <ClCompile Include="application\base\Framework.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\MyMath.cpp" />
     <ClCompile Include="engine\io\ResourceObject.cpp" />
@@ -171,6 +172,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\3d\ModelManager.h" />
     <ClInclude Include="engine\base\SrvManager.h" />
     <ClInclude Include="application\base\GameSystem.h" />
+    <ClInclude Include="application\base\Framework.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

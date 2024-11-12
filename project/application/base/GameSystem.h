@@ -1,56 +1,47 @@
 #pragma once
-#include "Input.h"
+
+#include "Framework.h"
+#include "D3DResourceLeakChecker.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
+#include "Input.h"
+#include "Audio.h"
+#include "Camera.h"
 #include "ImGuiManager.h"
 #include "SpriteCommon.h"
 #include "Sprite.h"
-#include "TextureManager.h"
 #include "Object3dCommon.h"
 #include "Object3d.h"
-#include "ModelManager.h"
-#include "Camera.h"
 #include "SrvManager.h"
-
-#include "Audio.h"
-
-#include "Logger.h"
-#include "StringUtility.h"
-#include "D3DResourceLeakChecker.h"
-#include "MyMath.h"
+#include "ModelManager.h"
+#include "TextureManager.h"
 
 /// <summary>
 /// ゲームシーン
 /// </summary>
-class GameSystem
+class GameSystem : public Framework
 {
 public:
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize() override;
 
 	/// <summary>
 	/// 終了
 	/// </summary>
-	void Finalize();
+	void Finalize() override;
 
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update() override;
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw();
-
-	/// <summary>
-	/// ゲーム終了フラグ
-	/// </summary>
-	/// <returns></returns>
-	bool IsEndRequest() { return endRequest_; }
+	void Draw() override;
 
 private:
 	//ポインタ
@@ -71,7 +62,5 @@ private:
 	Object3dCommon* pObject3dCommon_ = nullptr;
 	std::vector<Object3d*> pObjects3d_;
 
-	// ゲーム終了フラグ
-	bool endRequest_ = false;
 };
 
