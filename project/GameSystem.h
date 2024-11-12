@@ -46,6 +46,12 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	/// ゲーム終了フラグ
+	/// </summary>
+	/// <returns></returns>
+	bool IsEndRequest() { return endRequest_; }
+
 private:
 	//ポインタ
 	D3DResourceLeakChecker* pLeakChecke_ = nullptr;
@@ -65,7 +71,7 @@ private:
 	Object3dCommon* pObject3dCommon_ = nullptr;
 	std::vector<Object3d*> pObjects3d_;
 
-	
-
+	// ゲーム終了フラグ
+	bool endRequest_ = false;
 };
 

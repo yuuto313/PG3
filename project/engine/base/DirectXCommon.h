@@ -246,5 +246,10 @@ private:
 	/// FPS固定更新
 	/// </summary>
 	void UpdateFixFPS();
+
+	/// <summary>
+	/// エラーと警告の抑制
+	/// </summary>
+	void CheckError();
 };
 
