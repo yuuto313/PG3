@@ -1,17 +1,13 @@
 #pragma once
 #include "BaseScene.h"
 #include "SpriteCommon.h"
-#include "Object3dCommon.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
 #include "Sprite.h"
-#include "Object3d.h"
-#include "Camera.h"
+#include "TextureManager.h"
 
 /// <summary>
-/// ゲームプレイシーン
+/// タイトルシーン
 /// </summary>
-class GameScene : public BaseScene
+class TitleScene : public BaseScene
 {
 public:
 	/// <summary>
@@ -35,8 +31,6 @@ public:
 	void Draw() override;
 
 private:
-	Camera* pCamera_ = nullptr;
 	std::vector<Sprite*> pSprites_;
-	std::vector<Object3d*> pObjects3d_;
 };
 

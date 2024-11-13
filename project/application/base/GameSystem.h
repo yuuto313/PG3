@@ -5,6 +5,8 @@
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
 
+#include "BaseScene.h"
+#include "TitleScene.h"
 #include "GameScene.h"
 
 /// <summary>
@@ -52,7 +54,8 @@ private:
 	Object3dCommon* pObject3dCommon_ = nullptr;
 
 	// シーン
-	GameScene* pGameScene_ = nullptr;
+	BaseScene* pGameScene_ = nullptr;
+	BaseScene* pTitleScene_ = nullptr;
 
 };
 

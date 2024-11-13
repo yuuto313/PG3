@@ -9,6 +9,8 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 
+#include "BaseScene.h"
+
 /// <summary>
 /// ゲーム全体の骨組み
 /// </summary>
