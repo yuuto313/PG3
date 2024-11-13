@@ -5,44 +5,25 @@ void GameSystem::Initialize()
 #pragma region 基盤システムの初期化
 
 	//-------------------------------------
-	// リークチェッカー
-	//-------------------------------------
-
-	pLeakChecke_->~D3DResourceLeakChecker();
-
-	//-------------------------------------
 	// WinAppAPIの初期化
 	//-------------------------------------
 
-	pWinApp_ = new WinApp();
+	pWinApp_ = WinApp::GetInstance();
 	pWinApp_->Initialize();
-	
+
 	//-------------------------------------
 	// DirectXの初期化
 	//-------------------------------------
 
-	pDxCommon_ = new DirectXCommon();
+	pDxCommon_ = DirectXCommon::GetInstance();
 	pDxCommon_->Initialize(pWinApp_);
+	
 
 	//-------------------------------------
-	// SRVマネージャの初期化
+	// 基底クラスの初期化
 	//-------------------------------------
 
-	SrvManager::GetInstance()->Initialize(pDxCommon_);
-
-	//-------------------------------------
-	// キーボード入力の初期化
-	//-------------------------------------
-
-	pInput_ = new Input();
-	pInput_->Initialize(pWinApp_);
-
-	//-------------------------------------
-	// Audioの初期化
-	//-------------------------------------
-
-	pAudio_ = new Audio();
-	pAudio_->InitXAudio2();
+	Framework::Initialize();
 
 	//-------------------------------------
 	// カメラの初期化
@@ -51,19 +32,11 @@ void GameSystem::Initialize()
 	pCamera_ = new Camera();
 	pCamera_->SetRotate({ 0.3f,0.0f,0.0f });
 	pCamera_->SetTranslate({ 0.0f,4.0f,-10.0f });
-	
-	//-------------------------------------
-	// ImGui（デバッグテキスト）の初期化
-	//-------------------------------------
-
-	pImguiManager_ = new ImGuiManager();
-	pImguiManager_->Initialize(pDxCommon_, pWinApp_);
 
 	//-------------------------------------
 	// テクスチャマネージャの初期化
 	//-------------------------------------
 
-	TextureManager::GetInstance()->Initialize(pDxCommon_);
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
 	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
 	TextureManager::GetInstance()->LoadTexture("resource/eto_tora_family.png");
@@ -72,7 +45,6 @@ void GameSystem::Initialize()
 	// 3dモデルマネージャの初期化
 	//-------------------------------------
 
-	ModelManager::GetInstance()->Initialize(pDxCommon_);
 	// .objファイルからモデルを読み込む
 	ModelManager::GetInstance()->LoadModel("plane.obj");
 	ModelManager::GetInstance()->LoadModel("axis.obj");
@@ -144,43 +116,18 @@ void GameSystem::Finalize()
 	//-------------------------------------
 
 	CoUninitialize();
-	
-	//-------------------------------------
-	// ImGuiの終了処理
-	//-------------------------------------
-
-	pImguiManager_->Finalize();
-
-	//-------------------------------------
-	// 3dモデルマネージャの終了処理
-	//-------------------------------------
-
-	ModelManager::GetInstance()->Finalize();
-
-	//-------------------------------------
-	// テクスチャマネージャの終了処理
-	//-------------------------------------
-
-	TextureManager::GetInstance()->Finalize();
-	
-	//-------------------------------------
-	// SRVマネージャの終了処理
-	//-------------------------------------
-
-	SrvManager::GetInstance()->Finalize();
-
-	
-	//-------------------------------------
-	// Audioクラスの後始末
-	//-------------------------------------
-
-	pAudio_->ResetXAudio2();
 
 	//-------------------------------------
 	// WindowsAPIの終了処理
 	//-------------------------------------
 
 	pWinApp_->Finalize();
+
+	//-------------------------------------
+	// DirectXCommonの終了処理
+	//-------------------------------------
+
+	pDxCommon_->Finalize();
 
 	//-------------------------------------
 	// 解放処理
@@ -195,16 +142,24 @@ void GameSystem::Finalize()
 		delete pSprites_[i];
 	}
 	delete pSpriteCommon_;
-	delete pImguiManager_;
-	delete pAudio_;
 	delete pCamera_;
-	delete pInput_;
-	delete pDxCommon_;
-	delete pWinApp_;
+
+	//-------------------------------------
+	// 基底クラスの終了処理
+	//-------------------------------------
+
+	Framework::Finalize();
+
 }
 
 void GameSystem::Update()
-{
+{	
+	//-------------------------------------
+	// 基底クラスの更新処理
+	//-------------------------------------
+
+	Framework::Update();
+
 	//-------------------------------------
 	// 終了リクエストを確認
 	//-------------------------------------
@@ -212,18 +167,6 @@ void GameSystem::Update()
 	if (pWinApp_->ProcessMessage()) {
 		endRequest_ = true;
 	}
-
-	//-------------------------------------
-	// フレームの始まる旨を告げる
-	//-------------------------------------
-
-	pImguiManager_->Begin();
-
-	//-------------------------------------
-	// キーボード入力の更新
-	//-------------------------------------
-
-	pInput_->Update();
 
 	//-------------------------------------
 	// スプライトの更新
@@ -258,8 +201,6 @@ void GameSystem::Update()
 	//-------------------------------------
 	// ImGui（デバッグテキスト）の更新
 	//-------------------------------------
-
-	pImguiManager_->UpdateGameUI();
 	
 	pCamera_->ImGui();
 	
@@ -276,7 +217,7 @@ void GameSystem::Draw()
 	// 描画前処理
 	//-------------------------------------
 
-		// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
+	// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
 	pDxCommon_->PreDraw();
 
 	// DescriptorHeapを設定
@@ -311,18 +252,6 @@ void GameSystem::Draw()
 	for (uint32_t i = 0; i < 2; i++) {
 		pObjects3d_[i]->Draw();
 	}
-
-	//-------------------------------------
-	//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
-	//-------------------------------------
-
-	pImguiManager_->End();
-
-	//-------------------------------------
-	// 画面表示できるようにする
-	//-------------------------------------
-
-	pImguiManager_->Draw();
 
 	//-------------------------------------
 	// 描画後処理

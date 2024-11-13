@@ -12,12 +12,15 @@
 
 using namespace Microsoft::WRL;
 
-DirectXCommon::DirectXCommon()
-{
-}
+DirectXCommon* DirectXCommon::instance = nullptr;
 
-DirectXCommon::~DirectXCommon()
+DirectXCommon* DirectXCommon::GetInstance()
 {
+	if (instance == nullptr) {
+		instance = new DirectXCommon;
+	}
+
+	return instance;
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> DirectXCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile)
@@ -226,6 +229,12 @@ void DirectXCommon::Initialize(WinApp* winApp)
 	// エラーと警告の確認
 	CheckError();
 
+}
+
+void DirectXCommon::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 void DirectXCommon::PreDraw()

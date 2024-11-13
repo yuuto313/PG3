@@ -4,6 +4,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 	
 #pragma comment(lib,"winmm.lib")
 
+WinApp* WinApp::instance = nullptr;
+
 //-------------------------------------
 // ウィンドウプロシージャ
 //-------------------------------------
@@ -26,6 +28,15 @@ LRESULT CALLBACK WinApp::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM l
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+
+WinApp* WinApp::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new WinApp;
+	}
+
+	return instance;
+}
 
 void WinApp::Initialize()
 {
@@ -103,4 +114,7 @@ void WinApp::Finalize()
 {
 	CloseWindow(hwnd_);
 	CoUninitialize();
+
+	delete instance;
+	instance = nullptr;
 }

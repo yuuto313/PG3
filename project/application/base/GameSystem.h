@@ -1,13 +1,8 @@
 #pragma once
 
 #include "Framework.h"
-#include "D3DResourceLeakChecker.h"
-#include "WinApp.h"
 #include "DirectXCommon.h"
-#include "Input.h"
-#include "Audio.h"
 #include "Camera.h"
-#include "ImGuiManager.h"
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "Object3dCommon.h"
@@ -17,7 +12,7 @@
 #include "TextureManager.h"
 
 /// <summary>
-/// ゲームシーン
+/// ゲーム全体
 /// </summary>
 class GameSystem : public Framework
 {
@@ -45,16 +40,10 @@ public:
 
 private:
 	//ポインタ
-	D3DResourceLeakChecker* pLeakChecke_ = nullptr;
+	DirectXCommon* pDxCommon_ = nullptr;
 	WinApp* pWinApp_ = nullptr;
 
-	DirectXCommon* pDxCommon_ = nullptr;
-
-	Input* pInput_ = nullptr;
-	Audio* pAudio_ = nullptr;
 	Camera* pCamera_ = nullptr;
-
-	ImGuiManager* pImguiManager_ = nullptr;
 
 	SpriteCommon* pSpriteCommon_ = nullptr;
 	std::vector<Sprite*> pSprites_;

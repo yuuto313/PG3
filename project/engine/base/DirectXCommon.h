@@ -19,14 +19,40 @@
 /// </summary>
 class DirectXCommon
 {
+private:// シングルトン設計
+	static DirectXCommon* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	DirectXCommon() = default;
+	~DirectXCommon() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	DirectXCommon(DirectXCommon&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	DirectXCommon& operator=(DirectXCommon&) = delete;
+
+
 public:
 	//namespace省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 	//-------------基本処理-------------//
 
-	DirectXCommon();
-	~DirectXCommon();
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static DirectXCommon* GetInstance();
 
 	/// <summary>
 	/// シェーダーのコンパイル
@@ -71,6 +97,11 @@ public:
 	/// 初期化
 	/// </summary>
 	void Initialize(WinApp* winApp);
+
+	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
 
 	/// <summary>
 	/// 描画前処理
