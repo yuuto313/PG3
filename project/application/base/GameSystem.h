@@ -34,9 +34,19 @@ public:
 	void Update() override;
 
 	/// <summary>
+	/// 描画前処理
+	/// </summary>
+	void PreDraw() override;
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw() override;
+
+	/// <summary>
+	/// 描画後処理
+	/// </summary>
+	void PostDraw() override;
 
 private:
 	//ポインタ

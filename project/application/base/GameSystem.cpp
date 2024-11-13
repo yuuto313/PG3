@@ -18,7 +18,6 @@ void GameSystem::Initialize()
 	pDxCommon_ = DirectXCommon::GetInstance();
 	pDxCommon_->Initialize(pWinApp_);
 	
-
 	//-------------------------------------
 	// 基底クラスの初期化
 	//-------------------------------------
@@ -100,7 +99,17 @@ void GameSystem::Initialize()
 		Vector3 translate = pObject3d->GetTranslate();
 		translate = Vector3(i * 1.0f, i + 1.0f);
 		pObject3d->SetTranslate(translate);
-		pObject3d->SetModel("axis.obj");
+
+		// 異なるモデルを割り当てる
+		std::string filePath;
+		if (i == 0) {
+			filePath = "axis.obj";
+		} else if (i == 1) {
+			filePath = "plane.obj";
+		}
+		
+		pObject3d->SetModel(filePath);
+
 		pObject3d->SetCamera(pCamera_);
 
 		pObjects3d_.push_back(pObject3d);
@@ -211,8 +220,8 @@ void GameSystem::Update()
 	}
 }
 
-void GameSystem::Draw()
-{
+void GameSystem::PreDraw()
+{	
 	//-------------------------------------
 	// 描画前処理
 	//-------------------------------------
@@ -222,14 +231,25 @@ void GameSystem::Draw()
 
 	// DescriptorHeapを設定
 	SrvManager::GetInstance()->PreDraw();
-
+	
 	//-------------------------------------
 	// スプライト描画準備
 	//-------------------------------------
 
 	// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
 	pSpriteCommon_->SetDraw();
+	
+	//-------------------------------------
+	// 3dオブジェクト描画準備
+	//-------------------------------------
 
+	// 3dオブジェクトの描画準備。3dオブジェクトの描画に共通のグラフィックスコマンドを積む
+	pObject3dCommon_->SetDraw();
+
+}
+
+void GameSystem::Draw()
+{
 	//-------------------------------------
 	// Sprite個々の描画
 	//-------------------------------------
@@ -239,13 +259,6 @@ void GameSystem::Draw()
 	}
 
 	//-------------------------------------
-	// 3dオブジェクト描画準備
-	//-------------------------------------
-
-	// 3dオブジェクトの描画準備。3dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	pObject3dCommon_->SetDraw();
-
-	//-------------------------------------
 	// 3dオブジェクト個々の描画
 	//-------------------------------------
 
@@ -253,10 +266,19 @@ void GameSystem::Draw()
 		pObjects3d_[i]->Draw();
 	}
 
+}
+
+void GameSystem::PostDraw()
+{
+	//-------------------------------------
+	// 基底クラスの描画後処理
+	//-------------------------------------
+
+	Framework::PostDraw();
+
 	//-------------------------------------
 	// 描画後処理
 	//-------------------------------------
 
 	pDxCommon_->PostDraw();
-
 }

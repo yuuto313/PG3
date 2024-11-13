@@ -7,7 +7,6 @@
 #include "Audio.h"
 #include "ImGuiManager.h"
 #include "SpriteCommon.h"
-#include "ModelCommon.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
 
@@ -25,7 +24,11 @@ public:
 
 	virtual void Update();
 
+	virtual void PreDraw() = 0;
+
 	virtual void Draw() = 0;
+
+	virtual void PostDraw();
 
 	virtual bool IsEndRequest() { return endRequest_; }
 
@@ -43,7 +46,6 @@ private:
 	Audio* pAudio_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
 	SpriteCommon* pSpCpmmon_ = nullptr;
-	ModelCommon* pMoCommon_ = nullptr;
 
 protected:
 
