@@ -1,6 +1,17 @@
 #include "Object3dCommon.h"
 #include "Logger.h"
 
+Object3dCommon* Object3dCommon::instance = nullptr;
+
+Object3dCommon* Object3dCommon::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new Object3dCommon;
+	}
+
+	return instance;
+}
+
 void Object3dCommon::Initialize(DirectXCommon* dxCommon)
 {
 	// 引数で受け取ってメンバ変数に記録する
@@ -11,6 +22,12 @@ void Object3dCommon::Initialize(DirectXCommon* dxCommon)
 	//-------------------------------------
 
 	CreateGraphicsPipeline();
+}
+
+void Object3dCommon::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 void Object3dCommon::ImGui()

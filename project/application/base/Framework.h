@@ -6,7 +6,6 @@
 #include "Input.h"
 #include "Audio.h"
 #include "ImGuiManager.h"
-#include "SpriteCommon.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
 
@@ -45,7 +44,6 @@ private:
 	Input* pInput_ = nullptr;
 	Audio* pAudio_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
-	SpriteCommon* pSpCpmmon_ = nullptr;
 
 protected:
 

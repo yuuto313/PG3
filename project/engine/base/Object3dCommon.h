@@ -7,15 +7,49 @@
 /// </summary>
 class Object3dCommon
 {
+private:// シングルトン設計
+
+	static Object3dCommon* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	Object3dCommon() = default;
+	~Object3dCommon() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	Object3dCommon(Object3dCommon&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	Object3dCommon& operator=(Object3dCommon&) = delete;
+
 public:
 
 	//-------------基本処理-------------//
+
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static Object3dCommon* GetInstance();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon"></param>
 	void Initialize(DirectXCommon* dxCommon);
+
+	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
 
 	/// <summary>
 	/// 更新

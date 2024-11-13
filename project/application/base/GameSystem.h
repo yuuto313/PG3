@@ -2,14 +2,10 @@
 
 #include "Framework.h"
 #include "DirectXCommon.h"
-#include "Camera.h"
 #include "SpriteCommon.h"
-#include "Sprite.h"
 #include "Object3dCommon.h"
-#include "Object3d.h"
-#include "SrvManager.h"
-#include "ModelManager.h"
-#include "TextureManager.h"
+
+#include "GameScene.h"
 
 /// <summary>
 /// ゲーム全体
@@ -49,17 +45,14 @@ public:
 	void PostDraw() override;
 
 private:
-	//ポインタ
+	// ポインタ
 	DirectXCommon* pDxCommon_ = nullptr;
 	WinApp* pWinApp_ = nullptr;
-
-	Camera* pCamera_ = nullptr;
-
 	SpriteCommon* pSpriteCommon_ = nullptr;
-	std::vector<Sprite*> pSprites_;
-
 	Object3dCommon* pObject3dCommon_ = nullptr;
-	std::vector<Object3d*> pObjects3d_;
+
+	// シーン
+	GameScene* pGameScene_ = nullptr;
 
 };
 

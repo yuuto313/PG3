@@ -27,15 +27,48 @@ enum class BlendMode {
 /// </summary>
 class SpriteCommon
 {
+private:// シングルトン設計
+
+	static SpriteCommon* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	SpriteCommon() = default;
+	~SpriteCommon() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	SpriteCommon(SpriteCommon&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	SpriteCommon& operator=(SpriteCommon&) = delete;
+
 public:
 
 	//-------------基本処理-------------//
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static SpriteCommon* GetInstance();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="dxCommon"></param>
 	void Initialize(DirectXCommon* dxCommon);
+
+	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
 
 	/// <summary>
 	/// 更新

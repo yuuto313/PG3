@@ -47,12 +47,6 @@ void Framework::Initialize()
 
 	ModelManager::GetInstance()->Initialize(DirectXCommon::GetInstance());
 
-	//-------------------------------------
-	// スプライト共通部の初期化
-	//-------------------------------------
-
-	pSpCpmmon_ = new SpriteCommon();
-	pSpCpmmon_->Initialize(DirectXCommon::GetInstance());
 }
 
 void Framework::Finalize()
@@ -91,7 +85,6 @@ void Framework::Finalize()
 	// 解放処理
 	//-------------------------------------
 
-	delete pSpCpmmon_;
 	delete pImguiManager_;
 	delete pAudio_;
 	delete pInput_;

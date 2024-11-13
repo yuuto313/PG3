@@ -2,6 +2,17 @@
 #include "Logger.h"
 #include "ImGuiManager.h"
 
+SpriteCommon* SpriteCommon::instance = nullptr;
+
+SpriteCommon* SpriteCommon::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new SpriteCommon;
+	}
+
+	return instance;
+}
+
 void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 {
 	// 引数で受け取ってメンバ変数に記録する
@@ -13,6 +24,12 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 
 	CreateGraphicsPipeline();
 
+}
+
+void SpriteCommon::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 void SpriteCommon::ImGui()
