@@ -9,7 +9,7 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 
-#include "BaseScene.h"
+#include "SceneManager.h"
 
 /// <summary>
 /// ゲーム全体の骨組み
@@ -48,6 +48,8 @@ private:
 	Input* pInput_ = nullptr;
 	Audio* pAudio_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
+
+	SceneManager* pSceneManager_ = nullptr;
 
 protected:
 
