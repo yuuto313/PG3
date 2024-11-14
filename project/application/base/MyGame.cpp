@@ -1,42 +1,28 @@
-#include "GameSystem.h"
+#include "MyGame.h"
 
-void GameSystem::Initialize()
+void MyGame::Initialize()
 {
 #pragma region 基盤システムの初期化
-
-	//-------------------------------------
-	// WinAppAPIの初期化
-	//-------------------------------------
-
-	pWinApp_ = WinApp::GetInstance();
-	pWinApp_->Initialize();
-
-	//-------------------------------------
-	// DirectXの初期化
-	//-------------------------------------
-
-	pDxCommon_ = DirectXCommon::GetInstance();
-	pDxCommon_->Initialize(pWinApp_);
 	
 	//-------------------------------------
 	// 基底クラスの初期化
 	//-------------------------------------
 
-	Framework::Initialize();
+	OYFramework::Initialize();
 
 	//-------------------------------------
 	// スプライト共通部の初期化
 	//-------------------------------------
 
 	pSpriteCommon_ = SpriteCommon::GetInstance();
-	pSpriteCommon_->Initialize(pDxCommon_);
+	pSpriteCommon_->Initialize(DirectXCommon::GetInstance());
 
 	//-------------------------------------
 	// 3dオブジェクト共通部の初期化
 	//-------------------------------------
 
 	pObject3dCommon_ = Object3dCommon::GetInstance();
-	pObject3dCommon_->Initialize(pDxCommon_);
+	pObject3dCommon_->Initialize(DirectXCommon::GetInstance());
 
 	
 #pragma endregion 基盤システムの初期化
@@ -61,7 +47,7 @@ void GameSystem::Initialize()
 
 }
 
-void GameSystem::Finalize()
+void MyGame::Finalize()
 {
 	//-------------------------------------
 	// COMの終了処理
@@ -82,18 +68,6 @@ void GameSystem::Finalize()
 	pSpriteCommon_->Finalize();
 
 	//-------------------------------------
-	// WindowsAPIの終了処理
-	//-------------------------------------
-
-	pWinApp_->Finalize();
-
-	//-------------------------------------
-	// DirectXCommonの終了処理
-	//-------------------------------------
-
-	pDxCommon_->Finalize();
-
-	//-------------------------------------
 	// ゲームシーンの終了処理
 	//-------------------------------------
 	
@@ -109,7 +83,7 @@ void GameSystem::Finalize()
 	// 基底クラスの終了処理
 	//-------------------------------------
 
-	Framework::Finalize();
+	OYFramework::Finalize();
 
 	//-------------------------------------
 	// ポインタ解放
@@ -120,13 +94,13 @@ void GameSystem::Finalize()
 
 }
 
-void GameSystem::Update()
+void MyGame::Update()
 {	
 	//-------------------------------------
 	// 基底クラスの更新処理
 	//-------------------------------------
 
-	Framework::Update();
+	OYFramework::Update();
 
 	//-------------------------------------
 	// タイトルシーンの更新処理
@@ -141,14 +115,6 @@ void GameSystem::Update()
 	//pGameScene_->Update();
 
 	//-------------------------------------
-	// 終了リクエストを確認
-	//-------------------------------------
-
-	if (pWinApp_->ProcessMessage()) {
-		endRequest_ = true;
-	}
-
-	//-------------------------------------
 	// ImGui（デバッグテキスト）の更新
 	//-------------------------------------
 
@@ -156,18 +122,16 @@ void GameSystem::Update()
 
 }
 
-void GameSystem::PreDraw()
+void MyGame::PreDraw()
 {	
-	//-------------------------------------
-	// 描画前処理
-	//-------------------------------------
-
-	// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
-	pDxCommon_->PreDraw();
-
-	// DescriptorHeapを設定
-	SrvManager::GetInstance()->PreDraw();
 	
+	//-------------------------------------
+	// 基底クラスの描画前処理
+	//-------------------------------------
+
+	OYFramework::PreDraw();
+
+
 	//-------------------------------------
 	// スプライト描画準備
 	//-------------------------------------
@@ -184,7 +148,7 @@ void GameSystem::PreDraw()
 
 }
 
-void GameSystem::Draw()
+void MyGame::Draw()
 {
 	//-------------------------------------
 	// タイトルシーンの描画処理
@@ -200,17 +164,12 @@ void GameSystem::Draw()
 
 }
 
-void GameSystem::PostDraw()
+void MyGame::PostDraw()
 {
 	//-------------------------------------
 	// 基底クラスの描画後処理
 	//-------------------------------------
 
-	Framework::PostDraw();
+	OYFramework::PostDraw();
 
-	//-------------------------------------
-	// 描画後処理
-	//-------------------------------------
-
-	pDxCommon_->PostDraw();
 }

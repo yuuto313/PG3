@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Framework.h"
+#include "OYFramework.h"
 #include "DirectXCommon.h"
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
@@ -12,7 +12,7 @@
 /// <summary>
 /// ゲーム全体
 /// </summary>
-class GameSystem : public Framework
+class MyGame : public OYFramework
 {
 public:
 
@@ -48,8 +48,6 @@ public:
 
 private:
 	// ポインタ
-	DirectXCommon* pDxCommon_ = nullptr;
-	WinApp* pWinApp_ = nullptr;
 	SpriteCommon* pSpriteCommon_ = nullptr;
 	Object3dCommon* pObject3dCommon_ = nullptr;
 

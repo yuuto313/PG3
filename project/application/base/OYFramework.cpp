@@ -1,6 +1,6 @@
-#include "Framework.h"
+#include "OYFramework.h"
 
-void Framework::Initialize()
+void OYFramework::Initialize()
 {
 	//-------------------------------------
 	// リークチェッカー
@@ -9,10 +9,24 @@ void Framework::Initialize()
 	pLeakChecke_->~D3DResourceLeakChecker();
 
 	//-------------------------------------
+	// WinAppAPIの初期化
+	//-------------------------------------
+
+	pWinApp_ = WinApp::GetInstance();
+	pWinApp_->Initialize();
+
+	//-------------------------------------
+	// DirectXの初期化
+	//-------------------------------------
+
+	pDxCommon_ = DirectXCommon::GetInstance();
+	pDxCommon_->Initialize(pWinApp_);
+
+	//-------------------------------------
 	// SRVマネージャの初期化
 	//-------------------------------------
 
-	SrvManager::GetInstance()->Initialize(DirectXCommon::GetInstance());
+	SrvManager::GetInstance()->Initialize(pDxCommon_);
 
 	//-------------------------------------
 	// キーボード入力の初期化
@@ -33,35 +47,29 @@ void Framework::Initialize()
 	//-------------------------------------
 
 	pImguiManager_ = new ImGuiManager();
-	pImguiManager_->Initialize(DirectXCommon::GetInstance(), WinApp::GetInstance());
+	pImguiManager_->Initialize(pDxCommon_, pWinApp_);
 
 	//-------------------------------------
 	// テクスチャマネージャの初期化
 	//-------------------------------------
 
-	TextureManager::GetInstance()->Initialize(DirectXCommon::GetInstance());
+	TextureManager::GetInstance()->Initialize(pDxCommon_);
 
 	//-------------------------------------
 	// 3dモデルマネージャの初期化
 	//-------------------------------------
 
-	ModelManager::GetInstance()->Initialize(DirectXCommon::GetInstance());
+	ModelManager::GetInstance()->Initialize(pDxCommon_);
 
 }
 
-void Framework::Finalize()
+void OYFramework::Finalize()
 {
 	//-------------------------------------
 	// ImGuiの終了処理
 	//-------------------------------------
 
 	pImguiManager_->Finalize();
-
-	//-------------------------------------
-	// SRVマネージャの終了処理
-	//-------------------------------------
-
-	SrvManager::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// Audioクラスの後始末
@@ -82,6 +90,24 @@ void Framework::Finalize()
 	TextureManager::GetInstance()->Finalize();
 
 	//-------------------------------------
+	// SRVマネージャの終了処理
+	//-------------------------------------
+
+	SrvManager::GetInstance()->Finalize();
+
+	//-------------------------------------
+	// DirectXCommonの終了処理
+	//-------------------------------------
+
+	pDxCommon_->Finalize();
+	
+	//-------------------------------------
+	// WindowsAPIの終了処理
+	//-------------------------------------
+
+	pWinApp_->Finalize();
+
+	//-------------------------------------
 	// 解放処理
 	//-------------------------------------
 
@@ -90,8 +116,16 @@ void Framework::Finalize()
 	delete pInput_;
 }
 
-void Framework::Update()
-{
+void OYFramework::Update()
+{	
+	//-------------------------------------
+	// 終了リクエストを確認
+	//-------------------------------------
+
+	if (pWinApp_->ProcessMessage()) {
+		endRequest_ = true;
+	}
+
 	//-------------------------------------
 	// フレームの始まる旨を告げる
 	//-------------------------------------
@@ -112,7 +146,21 @@ void Framework::Update()
 
 }
 
-void Framework::PostDraw()
+void OYFramework::PreDraw()
+{
+	//-------------------------------------
+	// 描画前処理
+	//-------------------------------------
+
+	// DirectXの描画準備。すべての描画に共通のグラフィックスコマンドを積む
+	pDxCommon_->PreDraw();
+
+	// DescriptorHeapを設定
+	SrvManager::GetInstance()->PreDraw();
+
+}
+
+void OYFramework::PostDraw()
 {
 	//-------------------------------------
 	// ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
@@ -125,9 +173,16 @@ void Framework::PostDraw()
 	//-------------------------------------
 
 	pImguiManager_->Draw();
+
+	//-------------------------------------
+	// 描画後処理
+	//-------------------------------------
+
+	pDxCommon_->PostDraw();
+
 }
 
-void Framework::Run()
+void OYFramework::Run()
 {
 
 	//-------------------------------------

@@ -1,5 +1,5 @@
-#include "Framework.h"
-#include "GameSystem.h"
+#include "OYFramework.h"
+#include "MyGame.h"
 
 //-------------------------------------
 // main関数
@@ -8,7 +8,7 @@
 //windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
-	Framework* pGame = new GameSystem();
+	OYFramework* pGame = new MyGame();
 
 	pGame->Run();
 

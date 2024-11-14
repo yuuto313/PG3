@@ -162,10 +162,10 @@
     <ClCompile Include="engine\base\SrvManager.cpp">
       <Filter>ソース ファイル\engine\base</Filter>
     </ClCompile>
-    <ClCompile Include="application\base\GameSystem.cpp">
+    <ClCompile Include="application\base\MyGame.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="application\base\Framework.cpp">
+    <ClCompile Include="application\base\OYFramework.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="application\scene\GameScene.cpp">
@@ -293,10 +293,10 @@
     <ClInclude Include="engine\base\SrvManager.h">
       <Filter>ヘッダー ファイル\engine\base</Filter>
     </ClInclude>
-    <ClInclude Include="application\base\GameSystem.h">
+    <ClInclude Include="application\base\MyGame.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="application\base\Framework.h">
+    <ClInclude Include="application\base\OYFramework.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="application\scene\GameScene.h">

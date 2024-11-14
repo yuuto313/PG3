@@ -14,10 +14,10 @@
 /// <summary>
 /// ゲーム全体の骨組み
 /// </summary>
-class Framework
+class OYFramework
 {
 public:
-	virtual ~Framework() = default;
+	virtual ~OYFramework() = default;
 
 	virtual void Initialize();
 
@@ -25,7 +25,7 @@ public:
 
 	virtual void Update();
 
-	virtual void PreDraw() = 0;
+	virtual void PreDraw();
 
 	virtual void Draw() = 0;
 
@@ -43,6 +43,8 @@ public:
 private:
 
 	D3DResourceLeakChecker* pLeakChecke_ = nullptr;
+	DirectXCommon* pDxCommon_ = nullptr;
+	WinApp* pWinApp_ = nullptr;
 	Input* pInput_ = nullptr;
 	Audio* pAudio_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
