@@ -35,7 +35,7 @@ void MyGame::Initialize()
 
 	// 最初のシーンの生成
 	BaseScene* scene = new TitleScene();
-	pSceneManager_->SetNextScene(scene);
+	pSceneManager_->GetInstance()->SetNextScene(scene);
 
 
 #pragma endregion シーン
@@ -117,7 +117,7 @@ void MyGame::Draw()
 	// シーンマネージャの描画処理
 	//-------------------------------------
 
-	pSceneManager_->Draw();
+	pSceneManager_->GetInstance()->Draw();
 
 }
 

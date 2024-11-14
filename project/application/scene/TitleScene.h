@@ -3,6 +3,8 @@
 #include "SpriteCommon.h"
 #include "Sprite.h"
 #include "TextureManager.h"
+#include "Input.h"
+#include "GameScene.h"
 
 /// <summary>
 /// タイトルシーン

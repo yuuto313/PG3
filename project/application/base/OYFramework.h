@@ -45,11 +45,8 @@ private:
 	D3DResourceLeakChecker* pLeakChecke_ = nullptr;
 	DirectXCommon* pDxCommon_ = nullptr;
 	WinApp* pWinApp_ = nullptr;
-	Input* pInput_ = nullptr;
 	Audio* pAudio_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
-
-	SceneManager* pSceneManager_ = nullptr;
 
 protected:
 

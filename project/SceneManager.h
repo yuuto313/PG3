@@ -6,9 +6,42 @@
 /// </summary>
 class SceneManager
 {
+private:// シングルトン設計
+
+	static SceneManager* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	SceneManager() = default;
+	~SceneManager() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	SceneManager(SceneManager&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	SceneManager& operator=(SceneManager&) = delete;
+
+
 public:
 
-	~SceneManager();
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static SceneManager* GetInstance();
+
+	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
 
 	/// <summary>
 	/// 更新

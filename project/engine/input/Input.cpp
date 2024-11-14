@@ -3,6 +3,17 @@
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 
+Input* Input::instance = nullptr;
+
+Input* Input::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new Input;
+	}
+
+	return instance;
+}
+
 void Input::Initialize(WinApp* winApp)
 {
 	//借りてきたWinAppのインスタンスを記録
@@ -22,6 +33,12 @@ void Input::Initialize(WinApp* winApp)
 	//排他制御レベルのセット
 	result = keyboard_->SetCooperativeLevel(winApp->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
+}
+
+void Input::Finalize()
+{
+	delete instance;
+	instance = nullptr;
 }
 
 void Input::Update()

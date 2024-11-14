@@ -32,8 +32,7 @@ void OYFramework::Initialize()
 	// キーボード入力の初期化
 	//-------------------------------------
 
-	pInput_ = new Input();
-	pInput_->Initialize(WinApp::GetInstance());
+	Input::GetInstance()->Initialize(WinApp::GetInstance());
 
 	//-------------------------------------
 	// Audioの初期化
@@ -53,7 +52,7 @@ void OYFramework::Initialize()
 	// シーンマネージャの生成
 	//-------------------------------------
 
-	pSceneManager_ = new SceneManager();
+	SceneManager::GetInstance();
 
 	//-------------------------------------
 	// テクスチャマネージャの初期化
@@ -75,7 +74,7 @@ void OYFramework::Finalize()
 	// シーンマネージャの解放
 	//-------------------------------------
 
-	delete pSceneManager_;
+	SceneManager::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// ImGuiの終了処理
@@ -88,6 +87,12 @@ void OYFramework::Finalize()
 	//-------------------------------------
 
 	pAudio_->ResetXAudio2();
+
+	//-------------------------------------
+	// Inputクラスの後始末
+	//-------------------------------------
+
+	Input::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// 3dモデルマネージャの終了処理
@@ -125,7 +130,6 @@ void OYFramework::Finalize()
 
 	delete pImguiManager_;
 	delete pAudio_;
-	delete pInput_;
 }
 
 void OYFramework::Update()
@@ -148,7 +152,7 @@ void OYFramework::Update()
 	// キーボード入力の更新
 	//-------------------------------------
 
-	pInput_->Update();
+	Input::GetInstance()->Update();
 
 	//-------------------------------------
 	// ImGui（デバッグテキスト）の更新
@@ -160,7 +164,7 @@ void OYFramework::Update()
 	// シーンマネージャの更新
 	//-------------------------------------
 
-	pSceneManager_->Update();
+	SceneManager::GetInstance()->Update();
 
 }
 
