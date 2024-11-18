@@ -32,6 +32,6 @@ public:
 	void Draw() override;
 
 private:
-	std::vector<Sprite*> pSprites_;
+	std::unique_ptr<Sprite> sprite_;
 };
 

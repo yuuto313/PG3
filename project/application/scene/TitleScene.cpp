@@ -13,28 +13,16 @@ void TitleScene::Initialize()
 	// スプライト生成
 	//-------------------------------------
 
-	Sprite* pSprite = new Sprite();
-
-	pSprite->Initialize(SpriteCommon::GetInstance(), "resource/uvChecker.png");
-
-	Vector2 position = pSprite->GetPosition();
-	position = Vector2(300.0f, 50.0f);
-	pSprite->SetPosition(position);
-
-	pSprites_.push_back(pSprite);
+	sprite_ = std::make_unique<Sprite>();
+	sprite_->Initialize(SpriteCommon::GetInstance(), "resource/uvChecker.png");
 
 }
 
 void TitleScene::Finalize()
 {
-	//-------------------------------------
-	// 解放処理
-	//-------------------------------------
-
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		delete pSprites_[i];
+	if(sprite_) {
+		sprite_.reset();
 	}
-
 }
 
 void TitleScene::Update()
@@ -53,16 +41,9 @@ void TitleScene::Update()
 	// スプライトの更新
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		pSprites_[i]->Update();
+	sprite_->Update();
 
-		pSprites_[i]->SetSize({ 600.0f,300.0f });
 
-		float rotation = pSprites_[i]->GetRotation();
-		rotation += 0.01f;
-		pSprites_[i]->SetRotation(rotation);
-
-	}
 }
 
 void TitleScene::Draw()
@@ -71,7 +52,5 @@ void TitleScene::Draw()
 	// Sprite個々の描画
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		pSprites_[i]->Draw();
-	}
+	sprite_->Draw();
 }

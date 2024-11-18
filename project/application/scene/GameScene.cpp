@@ -28,16 +28,21 @@ void GameScene::Initialize()
 	// カメラの初期化
 	//-------------------------------------
 
-	pCamera_ = new Camera();
-	pCamera_->SetRotate({ 0.3f,0.0f,0.0f });
-	pCamera_->SetTranslate({ 0.0f,4.0f,-10.0f });
+	camera_ = std::make_unique<Camera>();
+	camera_->SetRotate({ 0.3f,0.0f,0.0f });
+	camera_->SetTranslate({ 0.0f,4.0f,-10.0f });
 
 	//-------------------------------------
 	// スプライト生成
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < 3; ++i) {
-		Sprite* pSprite = new Sprite();
+	sprites_.emplace_back(std::make_unique<Sprite>());
+	sprites_.emplace_back(std::make_unique<Sprite>());
+	sprites_.emplace_back(std::make_unique<Sprite>());
+
+	int i = 0;
+
+	for (const auto& sprite : sprites_) {
 		// スプライトごとに異なるテクスチャを割り当てる
 		std::string texturePath;
 		if (i == 0) {
@@ -48,27 +53,32 @@ void GameScene::Initialize()
 			texturePath = "resource/monsterBall.png";
 		}
 
-		pSprite->Initialize(SpriteCommon::GetInstance() , texturePath);
+		sprite->Initialize(SpriteCommon::GetInstance(), texturePath);
 
-		Vector2 position = pSprite->GetPosition();
+		Vector2 position = sprite->GetPosition();
 		position = Vector2(i * 300.0f, i + 50.0f);
-		pSprite->SetPosition(position);
+		sprite->SetPosition(position);
 
-		pSprites_.push_back(pSprite);
+		sprites_.push_back(sprite);
+
+		i++;
+	
 	}
 
 	//-------------------------------------
 	// 3dオブジェクト生成
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < 2; ++i) {
-		Object3d* pObject3d = new Object3d();
+	objects3d_.emplace_back(std::make_unique<Object3d>());
+	objects3d_.emplace_back(std::make_unique<Object3d>());
 
-		pObject3d->Initialize(Object3dCommon::GetInstance());
+	for (const auto& object3d : objects3d_) {
 
-		Vector3 translate = pObject3d->GetTranslate();
+		object3d->Initialize(Object3dCommon::GetInstance());
+
+		Vector3 translate = object3d->GetTranslate();
 		translate = Vector3(i * 1.0f, i + 1.0f);
-		pObject3d->SetTranslate(translate);
+		object3d->SetTranslate(translate);
 
 		// 異なるモデルを割り当てる
 		std::string filePath;
@@ -78,11 +88,13 @@ void GameScene::Initialize()
 			filePath = "plane.obj";
 		}
 
-		pObject3d->SetModel(filePath);
+		object3d->SetModel(filePath);
 
-		pObject3d->SetCamera(pCamera_);
+		object3d->SetCamera(camera_.get());
 
-		pObjects3d_.push_back(pObject3d);
+		objects3d_.push_back(object3d);
+
+		i++;
 	}
 
 	//-------------------------------------
@@ -99,15 +111,7 @@ void GameScene::Finalize()
 	// 解放処理
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pObjects3d_.size(); i++) {
-		delete pObjects3d_[i];
-	}
-
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		delete pSprites_[i];
-	}
-
-	delete pCamera_;
+	
 }
 
 void GameScene::Update()
@@ -126,15 +130,17 @@ void GameScene::Update()
 	// スプライトの更新
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		pSprites_[i]->Update();
+	for (const auto& sprite : sprites_) {
+		sprite->Update();
 
-		pSprites_[i]->SetSize({ 600.0f,300.0f });
+		sprite->SetSize({ 600.0f,300.0f });
 
-		float rotation = pSprites_[i]->GetRotation();
+		float rotation = sprite->GetRotation();
 		rotation += 0.01f;
-		pSprites_[i]->SetRotation(rotation);
+		sprite->SetRotation(rotation);
 
+		// ImGuiを表示
+		sprite->ImGui();
 	}
 
 	//-------------------------------------
@@ -142,25 +148,15 @@ void GameScene::Update()
 	//-------------------------------------
 
 	// 3dオブジェクトの更新より前に行う
-	pCamera_->Update();
+	camera_->Update();
 
 	//-------------------------------------
 	// 3dオブジェクトの更新
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pObjects3d_.size(); i++) {
-		pObjects3d_[i]->Update();
+	for (const auto& object3d : objects3d_) {
+		object3d->Update();
 	}
-
-	//-------------------------------------
-	// ImGui（デバッグテキスト）の更新
-	//-------------------------------------
-
-	pCamera_->ImGui();
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		pSprites_[i]->ImGui();
-	}
-
 
 }
 
@@ -170,15 +166,15 @@ void GameScene::Draw()
 	// Sprite個々の描画
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pSprites_.size(); ++i) {
-		pSprites_[i]->Draw();
+	for (const auto& sprite : sprites_) {
+		sprite->Draw();
 	}
 
 	//-------------------------------------
 	// 3dオブジェクト個々の描画
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < pObjects3d_.size(); i++) {
-		pObjects3d_[i]->Draw();
+	for (const auto& object3d : objects3d_) {
+		object3d->Draw();
 	}
 }
