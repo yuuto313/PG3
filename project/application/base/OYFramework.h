@@ -10,6 +10,7 @@
 #include "Object3dCommon.h"
 
 #include "SceneManager.h"
+#include "SceneFactory.h"
 
 /// <summary>
 /// ゲーム全体の骨組み
@@ -47,7 +48,11 @@ private:
 	DirectXCommon* pDxCommon_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
 
-protected:
+
+
+protected:	
+	// シーンファクトリー
+	AbstractSceneFactory* sceneFactory_ = nullptr;
 
 	bool endRequest_ = false;
 

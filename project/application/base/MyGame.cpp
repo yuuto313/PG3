@@ -1,4 +1,5 @@
 #include "MyGame.h"
+#include "SceneFactory.h"
 
 void MyGame::Initialize()
 {
@@ -32,9 +33,11 @@ void MyGame::Initialize()
 	// シーンの生成
 	//-------------------------------------
 
-	// 最初のシーンの生成
-	BaseScene* scene = new TitleScene();
-	SceneManager::GetInstance()->SetNextScene(scene);
+	// シーンファクトリーを生成し、マネージャにセット
+	sceneFactory_ = new SceneFactory();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	// シーンマネージャに最初のシーンをセット
+	SceneManager::GetInstance()->ChangeScene("TITLE");
 
 
 #pragma endregion シーン

@@ -127,6 +127,7 @@ void OYFramework::Finalize()
 	// 解放処理
 	//-------------------------------------
 
+	delete sceneFactory_;
 	delete pImguiManager_;
 }
 

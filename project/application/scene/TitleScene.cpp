@@ -45,10 +45,8 @@ void TitleScene::Update()
 
 	// enterキーを押したら
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
-		// ゲームシーン（次のシーン）を生成
-		BaseScene* scene = new GameScene();
-		// シーン切り替え依頼
-		SceneManager::GetInstance()->SetNextScene(scene);
+		// シーン切り替え
+		SceneManager::GetInstance()->ChangeScene("GAME");
 	}
 
 	//-------------------------------------

@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseScene.h"
+#include "AbstractSceneFactory.h"
 
 /// <summary>
 /// シーン管理
@@ -51,12 +52,18 @@ public:
 	/// 描画
 	/// </summary>
 	void Draw();
-
+	
 	/// <summary>
 	/// 次のシーン予約
 	/// </summary>
-	/// <param name="nextScene"></param>
-	void SetNextScene(BaseScene* nextScene) { nextScene_ = nextScene; }
+	/// <param name="sceneName"></param>
+	void ChangeScene(const std::string& sceneName);
+
+	/// <summary>
+	/// シーンファクトリーのセッター
+	/// </summary>
+	/// <param name="sceneFactory"></param>
+	void SetSceneFactory(AbstractSceneFactory* sceneFactory) { sceneFactory_ = sceneFactory; }
 
 private:
 	// 今のシーン（実行中シーン)
@@ -64,6 +71,10 @@ private:
 
 	// 次のシーン
 	BaseScene* nextScene_ = nullptr;
+
+	// シーンファクトリー（借りてくる）
+	AbstractSceneFactory* sceneFactory_ = nullptr;
+
 
 };
 
