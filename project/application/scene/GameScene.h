@@ -7,6 +7,9 @@
 #include "Sprite.h"
 #include "Object3d.h"
 #include "Camera.h"
+#include "Input.h"
+
+#include "TitleScene.h"
 
 /// <summary>
 /// ゲームプレイシーン

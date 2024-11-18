@@ -34,7 +34,7 @@ void Object3dCommon::ImGui()
 {
 }
 
-void Object3dCommon::SetDraw()
+void Object3dCommon::PreDraw()
 {
 	// RootSignatureを設定。PSOに設定してるけど別途設定が必要
 	dxCommon_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());

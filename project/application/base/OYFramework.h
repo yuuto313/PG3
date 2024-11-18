@@ -3,11 +3,11 @@
 #include "DirectXCommon.h"
 #include "SrvManager.h"
 #include "WinApp.h"
-#include "Input.h"
-#include "Audio.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
+#include "SpriteCommon.h"
+#include "Object3dCommon.h"
 
 #include "SceneManager.h"
 
@@ -43,9 +43,8 @@ public:
 private:
 
 	D3DResourceLeakChecker* pLeakChecke_ = nullptr;
-	DirectXCommon* pDxCommon_ = nullptr;
 	WinApp* pWinApp_ = nullptr;
-	Audio* pAudio_ = nullptr;
+	DirectXCommon* pDxCommon_ = nullptr;
 	ImGuiManager* pImguiManager_ = nullptr;
 
 protected:

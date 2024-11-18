@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "SceneManager.h"
 
 void GameScene::Initialize()
 {
@@ -111,6 +112,18 @@ void GameScene::Finalize()
 
 void GameScene::Update()
 {
+	//-------------------------------------
+	// シーン切り替え依頼
+	//-------------------------------------
+
+	// enterキーを押したら
+	if (Input::GetInstance()->TriggerKey(DIK_RETURN)) {
+		// ゲームシーン（次のシーン）を生成
+		BaseScene* scene = new TitleScene();
+		// シーン切り替え依頼
+		SceneManager::GetInstance()->SetNextScene(scene);
+	}
+
 	//-------------------------------------
 	// スプライトの更新
 	//-------------------------------------

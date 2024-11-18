@@ -13,26 +13,15 @@ void TitleScene::Initialize()
 	// スプライト生成
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < 3; ++i) {
-		Sprite* pSprite = new Sprite();
-		// スプライトごとに異なるテクスチャを割り当てる
-		std::string texturePath;
-		if (i == 0) {
-			texturePath = "resource/uvChecker.png";
-		} else if (i == 1) {
-			texturePath = "resource/eto_tora_family.png";
-		} else {
-			texturePath = "resource/monsterBall.png";
-		}
+	Sprite* pSprite = new Sprite();
 
-		pSprite->Initialize(SpriteCommon::GetInstance(), texturePath);
+	pSprite->Initialize(SpriteCommon::GetInstance(), "resource/uvChecker.png");
 
-		Vector2 position = pSprite->GetPosition();
-		position = Vector2(i * 300.0f, i + 50.0f);
-		pSprite->SetPosition(position);
+	Vector2 position = pSprite->GetPosition();
+	position = Vector2(300.0f, 50.0f);
+	pSprite->SetPosition(position);
 
-		pSprites_.push_back(pSprite);
-	}
+	pSprites_.push_back(pSprite);
 
 }
 

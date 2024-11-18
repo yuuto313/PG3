@@ -1,9 +1,9 @@
 #pragma once
 
 #include "OYFramework.h"
+#include "Input.h"
+#include "Audio.h"
 #include "DirectXCommon.h"
-#include "SpriteCommon.h"
-#include "Object3dCommon.h"
 
 #include "SceneManager.h"
 #include "TitleScene.h"
@@ -47,11 +47,7 @@ public:
 
 private:
 	// ポインタ
-	SpriteCommon* pSpriteCommon_ = nullptr;
-	Object3dCommon* pObject3dCommon_ = nullptr;
-
-	// シーン
-	SceneManager* pSceneManager_ = nullptr;
+	Audio* pAudio_ = nullptr;
 
 };
 

@@ -27,33 +27,7 @@ void OYFramework::Initialize()
 	//-------------------------------------
 
 	SrvManager::GetInstance()->Initialize(pDxCommon_);
-
-	//-------------------------------------
-	// キーボード入力の初期化
-	//-------------------------------------
-
-	Input::GetInstance()->Initialize(WinApp::GetInstance());
-
-	//-------------------------------------
-	// Audioの初期化
-	//-------------------------------------
-
-	pAudio_ = new Audio();
-	pAudio_->InitXAudio2();
-
-	//-------------------------------------
-	// ImGui（デバッグテキスト）の初期化
-	//-------------------------------------
-
-	pImguiManager_ = new ImGuiManager();
-	pImguiManager_->Initialize(pDxCommon_, pWinApp_);
-
-	//-------------------------------------
-	// シーンマネージャの生成
-	//-------------------------------------
-
-	SceneManager::GetInstance();
-
+	
 	//-------------------------------------
 	// テクスチャマネージャの初期化
 	//-------------------------------------
@@ -61,10 +35,35 @@ void OYFramework::Initialize()
 	TextureManager::GetInstance()->Initialize(pDxCommon_);
 
 	//-------------------------------------
+	// スプライト共通部の初期化
+	//-------------------------------------
+
+	SpriteCommon::GetInstance()->Initialize(pDxCommon_);
+	
+	//-------------------------------------
+	// 3dオブジェクト共通部の初期化
+	//-------------------------------------
+
+	Object3dCommon::GetInstance()->Initialize(pDxCommon_);
+
+	//-------------------------------------
 	// 3dモデルマネージャの初期化
 	//-------------------------------------
 
 	ModelManager::GetInstance()->Initialize(pDxCommon_);
+	
+	//-------------------------------------
+	// ImGui（デバッグテキスト）の初期化
+	//-------------------------------------
+
+	pImguiManager_ = new ImGuiManager();
+	pImguiManager_->Initialize(pDxCommon_, pWinApp_);
+	
+	//-------------------------------------
+	// シーンマネージャの生成
+	//-------------------------------------
+
+	SceneManager::GetInstance();
 
 }
 
@@ -81,24 +80,24 @@ void OYFramework::Finalize()
 	//-------------------------------------
 
 	pImguiManager_->Finalize();
-
-	//-------------------------------------
-	// Audioクラスの後始末
-	//-------------------------------------
-
-	pAudio_->ResetXAudio2();
-
-	//-------------------------------------
-	// Inputクラスの後始末
-	//-------------------------------------
-
-	Input::GetInstance()->Finalize();
-
+	
 	//-------------------------------------
 	// 3dモデルマネージャの終了処理
 	//-------------------------------------
 
 	ModelManager::GetInstance()->Finalize();
+
+	//-------------------------------------
+	// 3dオブジェクト共通部の終了処理
+	//-------------------------------------
+
+	Object3dCommon::GetInstance()->Finalize();
+
+	//-------------------------------------
+	// スプライト共通部の終了処理
+	//-------------------------------------
+
+	SpriteCommon::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// テクスチャマネージャの終了処理
@@ -129,7 +128,6 @@ void OYFramework::Finalize()
 	//-------------------------------------
 
 	delete pImguiManager_;
-	delete pAudio_;
 }
 
 void OYFramework::Update()
@@ -149,10 +147,10 @@ void OYFramework::Update()
 	pImguiManager_->Begin();
 
 	//-------------------------------------
-	// キーボード入力の更新
+	// ImGui（デバッグテキスト）の更新
 	//-------------------------------------
 
-	Input::GetInstance()->Update();
+	SpriteCommon::GetInstance()->ImGui();
 
 	//-------------------------------------
 	// ImGui（デバッグテキスト）の更新
@@ -179,6 +177,20 @@ void OYFramework::PreDraw()
 
 	// DescriptorHeapを設定
 	SrvManager::GetInstance()->PreDraw();
+
+	//-------------------------------------
+	// スプライト描画準備
+	//-------------------------------------
+
+	// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
+	SpriteCommon::GetInstance()->PreDraw();
+
+	//-------------------------------------
+	// 3dオブジェクト描画準備
+	//-------------------------------------
+
+	// 3dオブジェクトの描画準備。3dオブジェクトの描画に共通のグラフィックスコマンドを積む
+	Object3dCommon::GetInstance()->PreDraw();
 
 }
 

@@ -11,18 +11,17 @@ void MyGame::Initialize()
 	OYFramework::Initialize();
 
 	//-------------------------------------
-	// スプライト共通部の初期化
+	// キーボード入力の初期化
 	//-------------------------------------
 
-	pSpriteCommon_ = SpriteCommon::GetInstance();
-	pSpriteCommon_->Initialize(DirectXCommon::GetInstance());
+	Input::GetInstance()->Initialize(WinApp::GetInstance());
 
 	//-------------------------------------
-	// 3dオブジェクト共通部の初期化
+	// Audioの初期化
 	//-------------------------------------
 
-	pObject3dCommon_ = Object3dCommon::GetInstance();
-	pObject3dCommon_->Initialize(DirectXCommon::GetInstance());
+	pAudio_ = new Audio();
+	pAudio_->InitXAudio2();
 
 	
 #pragma endregion 基盤システムの初期化
@@ -35,7 +34,7 @@ void MyGame::Initialize()
 
 	// 最初のシーンの生成
 	BaseScene* scene = new TitleScene();
-	pSceneManager_->GetInstance()->SetNextScene(scene);
+	SceneManager::GetInstance()->SetNextScene(scene);
 
 
 #pragma endregion シーン
@@ -51,22 +50,24 @@ void MyGame::Finalize()
 	CoUninitialize();
 
 	//-------------------------------------
-	// 3dオブジェクト共通部の終了処理
+	// Audioクラスの後始末
 	//-------------------------------------
 
-	pObject3dCommon_->Finalize();
+	pAudio_->ResetXAudio2();
 
 	//-------------------------------------
-	// スプライト共通部の終了処理
+	// Inputクラスの後始末
 	//-------------------------------------
 
-	pSpriteCommon_->Finalize();
+	Input::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// 基底クラスの終了処理
 	//-------------------------------------
 
 	OYFramework::Finalize();
+
+	delete pAudio_;
 
 }
 
@@ -79,10 +80,10 @@ void MyGame::Update()
 	OYFramework::Update();
 
 	//-------------------------------------
-	// ImGui（デバッグテキスト）の更新
+	// キーボード入力の更新
 	//-------------------------------------
 
-	pSpriteCommon_->ImGui();
+	Input::GetInstance()->Update();
 
 }
 
@@ -95,20 +96,6 @@ void MyGame::PreDraw()
 
 	OYFramework::PreDraw();
 
-	//-------------------------------------
-	// スプライト描画準備
-	//-------------------------------------
-
-	// Spriteの描画準備。Spriteの描画に共通のグラフィックスコマンドを積む
-	pSpriteCommon_->SetDraw();
-	
-	//-------------------------------------
-	// 3dオブジェクト描画準備
-	//-------------------------------------
-
-	// 3dオブジェクトの描画準備。3dオブジェクトの描画に共通のグラフィックスコマンドを積む
-	pObject3dCommon_->SetDraw();
-
 }
 
 void MyGame::Draw()
@@ -117,7 +104,7 @@ void MyGame::Draw()
 	// シーンマネージャの描画処理
 	//-------------------------------------
 
-	pSceneManager_->GetInstance()->Draw();
+	SceneManager::GetInstance()->Draw();
 
 }
 

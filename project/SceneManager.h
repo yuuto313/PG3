@@ -29,7 +29,6 @@ private:// シングルトン設計
 	/// <returns></returns>
 	SceneManager& operator=(SceneManager&) = delete;
 
-
 public:
 
 	/// <summary>
