@@ -22,6 +22,12 @@ void Audio::InitXAudio2()
 
 }
 
+void Audio::Finalize()
+{
+	delete instance;
+	instance = nullptr;
+}
+
 SoundData Audio::SoundLoadWave(const char* filename)
 {
 	//--------------------------------
@@ -109,6 +115,9 @@ void Audio::SoundUnload(SoundData* soundData)
 	soundData->pBuffer = 0;
 	soundData->bufferSize = 0;
 	soundData->wfex = {};
+
+	masterVoice_ = nullptr;
+
 }
 
 void Audio::SoundPlayWave(const SoundData& soundData)
@@ -144,6 +153,4 @@ void Audio::ResetXAudio2()
 {
 	// XAudio2の解放
 	xAudio2_.Reset();
-
-	masterVoice_ = nullptr;
 }

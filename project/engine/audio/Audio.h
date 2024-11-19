@@ -48,6 +48,11 @@ public:
 	void InitXAudio2();
 	
 	/// <summary>
+	/// 終了
+	/// </summary>
+	void Finalize();
+
+	/// <summary>
 	/// 音声データの読み込み
 	/// </summary>
 	/// <param name="filename"></param>

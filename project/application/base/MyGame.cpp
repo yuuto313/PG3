@@ -56,6 +56,7 @@ void MyGame::Finalize()
 	//-------------------------------------
 
 	Audio::GetInstance()->ResetXAudio2();
+	Audio::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// Inputクラスの後始末

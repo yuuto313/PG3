@@ -1,6 +1,6 @@
 #include "TitleScene.h"
 #include "SceneManager.h"
-#include "Audio.h"
+#include "ImGuiManager.h"
 
 void TitleScene::Initialize()
 {
@@ -8,13 +8,13 @@ void TitleScene::Initialize()
 	// オーディオファイルの読み込み
 	//-------------------------------------
 
-	Audio::GetInstance()->SoundLoadWave("Resources/sound/Alarm01.wav");
+	soundData_ = Audio::GetInstance()->SoundLoadWave("Resources/sound/Alarm01.wav");
 
 	//-------------------------------------
 	// BGM再生開始
 	//-------------------------------------
 
-	Audio::GetInstance()->SoundPlayWave()
+	Audio::GetInstance()->SoundPlayWave(soundData_);
 
 	//-------------------------------------
 	// テクスチャファイルの読み込み
@@ -38,6 +38,9 @@ void TitleScene::Finalize()
 	if(sprite_) {
 		sprite_.reset();
 	}
+
+	Audio::GetInstance()->SoundUnload(&soundData_);
+
 }
 
 void TitleScene::Update()
@@ -58,7 +61,9 @@ void TitleScene::Update()
 
 	sprite_->Update();
 
-
+	ImGui::Begin("Info");
+	ImGui::Text("ENTER : GameScene\n");
+	ImGui::End();
 }
 
 void TitleScene::Draw()

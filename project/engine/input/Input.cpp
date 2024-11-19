@@ -16,9 +16,6 @@ Input* Input::GetInstance()
 
 void Input::Initialize(WinApp* winApp)
 {
-	//借りてきたWinAppのインスタンスを記録
-	winApp_ = winApp;
-
 	HRESULT result;
 
 	result = DirectInput8Create(winApp->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);

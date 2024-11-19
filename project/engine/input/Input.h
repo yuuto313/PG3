@@ -85,8 +85,5 @@ private:
 
 	//前回の全キーの状態
 	BYTE keyPre_[256] = {};
-
-	//WindowsAPI
-	WinApp* winApp_ = nullptr;
 };
 

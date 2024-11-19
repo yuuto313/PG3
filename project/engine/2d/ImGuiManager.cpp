@@ -4,10 +4,11 @@ ImGuiManager* ImGuiManager::instance = nullptr;
 
 ImGuiManager* ImGuiManager::GetInstance()
 {
+#ifdef  _DEBUG
 	if (instance == nullptr) {
 		instance = new ImGuiManager();
 	}
-
+#endif //  _DEBUG
 	return instance;
 }
 
@@ -70,4 +71,8 @@ void ImGuiManager::Finalize()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 #endif // _DEBUG
+
+	delete instance;
+	instance = nullptr;
+
 }
