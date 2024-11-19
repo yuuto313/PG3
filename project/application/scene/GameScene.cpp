@@ -59,8 +59,6 @@ void GameScene::Initialize()
 		position = Vector2(i * 300.0f, i + 50.0f);
 		sprite->SetPosition(position);
 
-		sprites_.push_back(sprite);
-
 		i++;
 	
 	}
@@ -92,8 +90,6 @@ void GameScene::Initialize()
 
 		object3d->SetCamera(camera_.get());
 
-		objects3d_.push_back(object3d);
-
 		i++;
 	}
 
@@ -111,7 +107,10 @@ void GameScene::Finalize()
 	// 解放処理
 	//-------------------------------------
 
-	
+	sprites_.clear();
+
+	objects3d_.clear();
+
 }
 
 void GameScene::Update()
