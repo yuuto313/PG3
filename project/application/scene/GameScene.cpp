@@ -40,14 +40,14 @@ void GameScene::Initialize()
 	sprites_.emplace_back(std::make_unique<Sprite>());
 	sprites_.emplace_back(std::make_unique<Sprite>());
 
-	int i = 0;
+	int spriteIndex = 0;
 
 	for (const auto& sprite : sprites_) {
 		// スプライトごとに異なるテクスチャを割り当てる
 		std::string texturePath;
-		if (i == 0) {
+		if (spriteIndex == 0) {
 			texturePath = "resource/uvChecker.png";
-		} else if (i == 1) {
+		} else if (spriteIndex == 1) {
 			texturePath = "resource/eto_tora_family.png";
 		} else {
 			texturePath = "resource/monsterBall.png";
@@ -56,10 +56,10 @@ void GameScene::Initialize()
 		sprite->Initialize(SpriteCommon::GetInstance(), texturePath);
 
 		Vector2 position = sprite->GetPosition();
-		position = Vector2(i * 300.0f, i + 50.0f);
+		position = Vector2(spriteIndex * 300.0f, spriteIndex + 50.0f);
 		sprite->SetPosition(position);
 
-		i++;
+		spriteIndex++;
 	
 	}
 
@@ -70,19 +70,21 @@ void GameScene::Initialize()
 	objects3d_.emplace_back(std::make_unique<Object3d>());
 	objects3d_.emplace_back(std::make_unique<Object3d>());
 
+	int modelIndex = 0;
+
 	for (const auto& object3d : objects3d_) {
 
 		object3d->Initialize(Object3dCommon::GetInstance());
 
 		Vector3 translate = object3d->GetTranslate();
-		translate = Vector3(i * 1.0f, i + 1.0f);
+		translate = Vector3(modelIndex * 1.0f, modelIndex + 1.0f);
 		object3d->SetTranslate(translate);
 
 		// 異なるモデルを割り当てる
 		std::string filePath;
-		if (i == 0) {
+		if (modelIndex == 0) {
 			filePath = "axis.obj";
-		} else if (i == 1) {
+		} else if (modelIndex == 1) {
 			filePath = "plane.obj";
 		}
 
@@ -90,7 +92,7 @@ void GameScene::Initialize()
 
 		object3d->SetCamera(camera_.get());
 
-		i++;
+		modelIndex++;
 	}
 
 	//-------------------------------------

@@ -46,9 +46,6 @@ private:
 	D3DResourceLeakChecker* pLeakChecke_ = nullptr;
 	WinApp* pWinApp_ = nullptr;
 	DirectXCommon* pDxCommon_ = nullptr;
-	ImGuiManager* pImguiManager_ = nullptr;
-
-
 
 protected:	
 	// シーンファクトリー

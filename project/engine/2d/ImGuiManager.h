@@ -14,8 +14,35 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 /// </summary>
 class ImGuiManager
 {
+private:// シングルトン設計
+	static ImGuiManager* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	ImGuiManager() = default;
+	~ImGuiManager() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	ImGuiManager(ImGuiManager&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	ImGuiManager& operator=(ImGuiManager&) = delete;
 public:
 	//-------------基本処理-------------//
+
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static ImGuiManager* GetInstance();
 
 	/// <summary>
 	/// 初期化

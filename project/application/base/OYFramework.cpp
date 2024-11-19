@@ -56,8 +56,7 @@ void OYFramework::Initialize()
 	// ImGui（デバッグテキスト）の初期化
 	//-------------------------------------
 
-	pImguiManager_ = new ImGuiManager();
-	pImguiManager_->Initialize(pDxCommon_, pWinApp_);
+	ImGuiManager::GetInstance()->Initialize(pDxCommon_, pWinApp_);
 	
 	//-------------------------------------
 	// シーンマネージャの生成
@@ -79,7 +78,7 @@ void OYFramework::Finalize()
 	// ImGuiの終了処理
 	//-------------------------------------
 
-	pImguiManager_->Finalize();
+	ImGuiManager::GetInstance()->Finalize();
 	
 	//-------------------------------------
 	// 3dモデルマネージャの終了処理
@@ -128,7 +127,6 @@ void OYFramework::Finalize()
 	//-------------------------------------
 
 	delete sceneFactory_;
-	delete pImguiManager_;
 }
 
 void OYFramework::Update()
@@ -145,7 +143,7 @@ void OYFramework::Update()
 	// フレームの始まる旨を告げる
 	//-------------------------------------
 
-	pImguiManager_->Begin();
+	ImGuiManager::GetInstance()->Begin();
 
 	//-------------------------------------
 	// ImGui（デバッグテキスト）の更新
@@ -157,7 +155,7 @@ void OYFramework::Update()
 	// ImGui（デバッグテキスト）の更新
 	//-------------------------------------
 
-	pImguiManager_->UpdateGameUI();
+	ImGuiManager::GetInstance()->UpdateGameUI();
 
 	//-------------------------------------
 	// シーンマネージャの更新
@@ -201,13 +199,13 @@ void OYFramework::PostDraw()
 	// ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
 	//-------------------------------------
 
-	pImguiManager_->End();
+	ImGuiManager::GetInstance()->End();
 
 	//-------------------------------------
 	// 画面表示できるようにする
 	//-------------------------------------
 
-	pImguiManager_->Draw();
+	ImGuiManager::GetInstance()->Draw();
 
 	//-------------------------------------
 	// 描画後処理

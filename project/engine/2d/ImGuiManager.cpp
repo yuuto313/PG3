@@ -1,5 +1,16 @@
 #include "ImGuiManager.h"
 
+ImGuiManager* ImGuiManager::instance = nullptr;
+
+ImGuiManager* ImGuiManager::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new ImGuiManager();
+	}
+
+	return instance;
+}
+
 void ImGuiManager::Initialize(DirectXCommon* dxCommon,WinApp* winApp)
 {
 #ifdef  _DEBUG

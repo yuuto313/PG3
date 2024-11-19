@@ -11,11 +11,40 @@
 /// </summary>
 class Audio
 {
+private:// シングルトン設計
+
+	static Audio* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	Audio() = default;
+	~Audio() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	Audio(Audio&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	Audio operator=(Audio&) = delete;
+
 public:
 
-	Audio();
-	~Audio();
+	/// <summary>
+	///	シングルトンインスタンスの取得
+	/// </summary>
+	/// <returns></returns>
+	static Audio* GetInstance();
 
+	/// <summary>
+	/// 初期化
+	/// </summary>
 	void InitXAudio2();
 	
 	/// <summary>
@@ -45,6 +74,6 @@ public:
 
 private:
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
-	IXAudio2MasteringVoice* masterVoice_ ;
+	IXAudio2MasteringVoice* masterVoice_ = nullptr;
 };
 

@@ -1,8 +1,21 @@
 #include "TitleScene.h"
 #include "SceneManager.h"
+#include "Audio.h"
 
 void TitleScene::Initialize()
 {
+	//-------------------------------------
+	// オーディオファイルの読み込み
+	//-------------------------------------
+
+	Audio::GetInstance()->SoundLoadWave("Resources/sound/Alarm01.wav");
+
+	//-------------------------------------
+	// BGM再生開始
+	//-------------------------------------
+
+	Audio::GetInstance()->SoundPlayWave()
+
 	//-------------------------------------
 	// テクスチャファイルの読み込み
 	//-------------------------------------
@@ -15,6 +28,8 @@ void TitleScene::Initialize()
 
 	sprite_ = std::make_unique<Sprite>();
 	sprite_->Initialize(SpriteCommon::GetInstance(), "resource/uvChecker.png");
+
+
 
 }
 

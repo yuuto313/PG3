@@ -1,13 +1,15 @@
 #include "Audio.h"
 #include <assert.h>
 
-Audio::Audio()
-{
-	masterVoice_ = nullptr;
-}
+Audio* Audio::instance = nullptr;
 
-Audio::~Audio()
+Audio* Audio::GetInstance()
 {
+	if (instance == nullptr) {
+		instance = new Audio();
+	}
+
+	return instance;
 }
 
 void Audio::InitXAudio2()
@@ -142,4 +144,6 @@ void Audio::ResetXAudio2()
 {
 	// XAudio2の解放
 	xAudio2_.Reset();
+
+	masterVoice_ = nullptr;
 }

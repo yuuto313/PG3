@@ -21,8 +21,7 @@ void MyGame::Initialize()
 	// Audioの初期化
 	//-------------------------------------
 
-	pAudio_ = new Audio();
-	pAudio_->InitXAudio2();
+	Audio::GetInstance()->InitXAudio2();
 
 	
 #pragma endregion 基盤システムの初期化
@@ -56,7 +55,7 @@ void MyGame::Finalize()
 	// Audioクラスの後始末
 	//-------------------------------------
 
-	pAudio_->ResetXAudio2();
+	Audio::GetInstance()->ResetXAudio2();
 
 	//-------------------------------------
 	// Inputクラスの後始末
@@ -69,8 +68,6 @@ void MyGame::Finalize()
 	//-------------------------------------
 
 	OYFramework::Finalize();
-
-	delete pAudio_;
 
 }
 

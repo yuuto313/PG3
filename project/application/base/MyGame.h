@@ -43,10 +43,5 @@ public:
 	/// 描画後処理
 	/// </summary>
 	void PostDraw() override;
-
-private:
-	// ポインタ
-	Audio* pAudio_ = nullptr;
-
 };
 
