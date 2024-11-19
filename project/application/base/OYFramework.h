@@ -48,8 +48,8 @@ private:
 	DirectXCommon* pDxCommon_ = nullptr;
 
 protected:	
-	// シーンファクトリー
-	AbstractSceneFactory* sceneFactory_ = nullptr;
+	// シーンファクトリー（管理者）
+	std::unique_ptr<AbstractSceneFactory> sceneFactory_;
 
 	bool endRequest_ = false;
 
