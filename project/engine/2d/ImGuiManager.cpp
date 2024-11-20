@@ -22,16 +22,16 @@ void ImGuiManager::Initialize(DirectXCommon* dxCommon,WinApp* winApp)
 	// ImGuiの初期
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsClassic();
 	ImGui_ImplWin32_Init(winApp_->GetHwnd());
-	ImGui_ImplDX12_Init(dxCommon_->GetDevice(), dxCommon_->GetSwapChainDesc().BufferCount, dxCommon_->GetRTVDesc().Format, SrvManager::GetInstance()->GetSrvDescriptorHeap(), SrvManager::GetInstance()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), SrvManager::GetInstance()->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+	ImGui_ImplDX12_Init(dxCommon_->GetDevice(), dxCommon_->GetBackBufferCount(), dxCommon_->GetRTVFormat(), SrvManager::GetInstance()->GetSrvDescriptorHeap(), SrvManager::GetInstance()->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart(), SrvManager::GetInstance()->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
 #endif //  _DEBUG
 }
 
 void ImGuiManager::Begin()
 {
 #ifdef _DEBUG
-	// フレームの先頭でImGuiに、ここからフレームが始まる旨を告げる
+	// ImGuiフレーム開始
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();

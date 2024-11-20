@@ -581,7 +581,7 @@ void DirectXCommon::InitializeDescriptorHeap()
 	// DSV用のデスクリプタヒープの生成
 	//-------------------------------------
 
-	// DSV用のヒープでディスクリプタヒープの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
+	// DSV用のヒープでデスクリプタヒープの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
 	dsvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 }
 

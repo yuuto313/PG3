@@ -128,16 +128,16 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList_.Get(); }
 
 	/// <summary>
-	/// swapChainDescの取得
+	/// ImGuiに渡すバックバッファの数
 	/// </summary>
 	/// <returns></returns>
-	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
+	UINT GetBackBufferCount() { return swapChainDesc_.BufferCount; }
 
 	/// <summary>
-	/// RTVDescの取得
+	/// ImGuiに渡すRTVのフォーマット
 	/// </summary>
 	/// <returns></returns>
-	D3D12_RENDER_TARGET_VIEW_DESC GetRTVDesc() { return rtvDesc_; }
+	DXGI_FORMAT GetRTVFormat() { return rtvDesc_.Format; }
 
 private: 
 	//-------------メンバ変数-------------//
