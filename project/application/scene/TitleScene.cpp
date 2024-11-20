@@ -62,7 +62,6 @@ void TitleScene::Update()
 	//-------------------------------------
 
 	sprite_->Update();
-	sprite_->SetPosition(position_);
 }
 
 void TitleScene::ImGui()
@@ -70,11 +69,6 @@ void TitleScene::ImGui()
 #ifdef _DEBUG
 	ImGui::Begin("Info");
 	ImGui::Text("ENTER : GameScene\n");
-	ImGui::End();
-
-	ImGui::SetNextWindowSize(ImVec2(500.0f, 100.0f), ImGuiCond_Always);
-	ImGui::Begin("09_03_Assignment");
-	ImGui::SliderFloat2("position", &position_.x, 0.0f, 500.0f);
 	ImGui::End();
 #endif _DEBUG
 }
