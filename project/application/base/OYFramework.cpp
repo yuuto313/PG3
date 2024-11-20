@@ -146,10 +146,6 @@ void OYFramework::Update()
 
 	SpriteCommon::GetInstance()->ImGui();
 
-	//-------------------------------------
-	// ImGui（デバッグテキスト）の更新
-	//-------------------------------------
-
 	ImGuiManager::GetInstance()->UpdateGameUI();
 
 	//-------------------------------------

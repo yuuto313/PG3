@@ -50,6 +50,7 @@ void SceneManager::Update()
 	//-------------------------------------
 
 	scene_->Update();
+	scene_->ImGui();
 
 }
 

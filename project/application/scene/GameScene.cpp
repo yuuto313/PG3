@@ -159,6 +159,10 @@ void GameScene::Update()
 
 }
 
+void GameScene::ImGui()
+{
+}
+
 void GameScene::Draw()
 {
 	//-------------------------------------

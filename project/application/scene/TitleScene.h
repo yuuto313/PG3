@@ -28,12 +28,18 @@ public:
 	void Update() override;
 
 	/// <summary>
+	/// ImGui
+	/// </summary>
+	void ImGui() override;
+
+	/// <summary>
 	/// 描画
 	/// </summary>
 	void Draw() override;
 
 private:
 	std::unique_ptr<Sprite> sprite_;
+	Vector2 position_;
 
 	SoundData soundData_;
 
