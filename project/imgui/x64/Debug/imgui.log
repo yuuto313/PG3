@@ -5,4 +5,4 @@
   imgui_impl_win32.cpp
   imgui_tables.cpp
   imgui_widgets.cpp
-  imgui.vcxproj -> C:\Users\sinba\source\repos\GE3\CG2-06_03\CG2-06_03\project\x64\Debug\imgui.lib
+  imgui.vcxproj -> C:\Users\sinba\source\repos\GE3\CG2-06_03\CG2-06_03\generated\obj\imgui\Debug\imgui.lib
