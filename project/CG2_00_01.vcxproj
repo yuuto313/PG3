@@ -105,6 +105,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application\scene\BaseScene.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="engine\3d\Camera.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
     <ClCompile Include="engine\io\D3DResourceLeakChecker.cpp" />
@@ -122,6 +123,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\base\MyGame.cpp" />
     <ClCompile Include="application\base\OYFramework.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\MyMath.cpp" />
     <ClCompile Include="engine\io\ResourceObject.cpp" />
@@ -139,10 +141,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\TitleScene.cpp" />
     <ClCompile Include="application\scene\SceneFactory.cpp" />
     <ClCompile Include="application\scene\SceneManager.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\scene\AbstractSceneFactory.h" />
     <ClInclude Include="application\scene\BaseScene.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="engine\3d\Camera.h" />
     <ClInclude Include="engine\audio\Audio.h" />
     <ClInclude Include="engine\io\D3DResourceLeakChecker.h" />
@@ -187,6 +191,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\TitleScene.h" />
     <ClInclude Include="application\scene\SceneFactory.h" />
     <ClInclude Include="application\scene\SceneManager.h" />
+    <ClInclude Include="InputHandler.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

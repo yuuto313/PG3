@@ -9,6 +9,10 @@
 #include "Camera.h"
 #include "Input.h"
 
+#include "Player.h"
+#include "InputHandler.h"
+#include <Command.h>
+
 /// <summary>
 /// ゲームプレイシーン
 /// </summary>
@@ -41,8 +45,10 @@ public:
 	void Draw() override;
 
 private:
-	std::unique_ptr<Camera> camera_;
-	std::vector<std::unique_ptr<Sprite>> sprites_;
-	std::vector<std::unique_ptr<Object3d>> objects3d_;
+	std::unique_ptr<Sprite> sprite_;
+
+	std::unique_ptr<Player> player_;
+	std::unique_ptr<ICommand> iCommand_;
+	std::unique_ptr<InputHandler> inputHandler_;
 };
 

@@ -36,7 +36,7 @@ void MyGame::Initialize()
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 	// シーンマネージャに最初のシーンをセット
-	SceneManager::GetInstance()->ChangeScene("TITLE");
+	SceneManager::GetInstance()->ChangeScene("GAME");
 
 
 #pragma endregion シーン
